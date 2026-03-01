@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XRAWS PUBLIC | عبدالله جاسم</title>
+    <title>XRAWS | TikTok Style</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,55 +11,127 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Cairo:wght@400;700;900&display=swap');
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #050505; font-family: 'Cairo', sans-serif; }
-        .video-container { height: 100vh; width: 100%; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; }
-        .video-container::-webkit-scrollbar { display: none; }
-        .video-card { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
-        video { height: 100%; width: 100%; object-fit: cover; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Cairo', sans-serif; }
         
-        /* الهوية الزجاجية العلوية */
-        .user-glass-card {
-            position: fixed; top: 20px; right: 20px; z-index: 1000;
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px;
-            padding: 10px 20px; color: white; display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        /* حاوية الفيديوهات - سحب عمودي */
+        .feed {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+        .feed::-webkit-scrollbar { display: none; }
+
+        .video-item {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            background: #000;
         }
 
-        .side-actions { position: absolute; right: 20px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; z-index: 10; }
-        .action-btn { 
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
-            width: 50px; height: 50px; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; color: white; border: 1px solid rgba(255,255,255,0.2);
+        video {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
         }
 
-        .auth-modal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+        /* الأزرار الجانبية (مثل الصورة التي أرفقتها) */
+        .side-bar {
+            position: absolute;
+            right: 15px;
+            bottom: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
         }
+
+        .action-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .action-unit i {
+            font-size: 28px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
+
+        .action-unit span {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        /* معلومات الفيديو بالأسفل */
+        .video-footer {
+            position: absolute;
+            left: 15px;
+            bottom: 30px;
+            right: 80px;
+            color: white;
+            z-index: 100;
+            text-align: right;
+        }
+
+        .user-tag { font-weight: 900; font-size: 18px; margin-bottom: 5px; display: block; }
+        .description { font-size: 14px; opacity: 0.9; line-height: 1.4; }
+
+        /* شريط التنقل السفلي الاحترافي */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: black;
+            border-top: 0.5px solid rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .nav-icon { color: white; font-size: 20px; display: flex; flex-direction: column; align-items: center; }
+        .nav-icon span { font-size: 10px; margin-top: 2px; }
+        .plus-btn { background: white; color: black !important; padding: 5px 15px; border-radius: 10px; font-weight: bold; }
+
+        /* نافذة تسجيل الدخول الزجاجية */
+        .auth-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+        }
+        .login-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 30px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; color: white; }
+        input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 12px; margin-bottom: 10px; color: white; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="user-glass-card" id="user-display">
-        <i class="fas fa-user-circle text-2xl text-pink-500"></i>
-        <button onclick="showAuth()" class="font-bold text-sm">تسجيل الدخول للأعضاء</button>
+    <div class="fixed top-0 w-full flex justify-center py-4 z-50 text-white font-bold opacity-70">
+        <span>اتبع | لك</span>
     </div>
 
-    <button id="up-btn" onclick="openWidget()" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-white/20 backdrop-blur-xl border border-white/30 text-white px-8 py-3 rounded-full font-black hidden shadow-2xl">
-        + انشر فيديو
-    </button>
+    <div class="feed" id="video-feed">
+        </div>
 
-    <div class="video-container" id="video-feed"></div>
+    <div class="bottom-nav">
+        <div class="nav-icon"><i class="fas fa-home"></i><span>الرئيسية</span></div>
+        <div class="nav-icon"><i class="fas fa-search"></i><span>اكتشف</span></div>
+        <div class="nav-icon plus-btn" id="plus-action" onclick="checkAuthAndUpload()"><i class="fas fa-plus"></i></div>
+        <div class="nav-icon"><i class="fas fa-comment-dots"></i><span>الرسائل</span></div>
+        <div class="nav-icon" id="profile-btn" onclick="showLogin()"><i class="fas fa-user"></i><span>الملف</span></div>
+    </div>
 
-    <div id="auth-modal" class="auth-modal">
-        <div class="bg-white/10 backdrop-blur-2xl p-10 rounded-[40px] border border-white/20 text-center w-80">
-            <h2 class="text-white font-black text-2xl mb-6 italic" style="font-family:Orbitron;">XRAWS</h2>
-            <input type="email" id="email" placeholder="البريد الإلكتروني" class="w-full bg-white/5 border border-white/20 p-3 rounded-xl mb-3 text-white text-center outline-none">
-            <input type="password" id="pass" placeholder="كلمة السر" class="w-full bg-white/5 border border-white/20 p-3 rounded-xl mb-6 text-white text-center outline-none">
-            <button onclick="login()" class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">دخول / انضمام</button>
-            <button onclick="closeAuth()" class="text-gray-400 mt-4 text-xs">إغلاق</button>
+    <div id="auth-modal" class="auth-overlay">
+        <div class="login-card">
+            <h2 class="text-2xl font-black mb-6">انضم إلى XRAWS</h2>
+            <input type="email" id="email" placeholder="البريد الإلكتروني">
+            <input type="password" id="pass" placeholder="كلمة السر">
+            <button onclick="handleAuth()" class="w-full bg-white text-black font-bold py-3 rounded-xl mt-2">تسجيل دخول</button>
+            <button onclick="hideLogin()" class="text-xs mt-4 opacity-60">إغلاق</button>
         </div>
     </div>
 
@@ -74,64 +146,61 @@
             appId: "1:636395398521:web:fbd094bd35a2883fda3ba8"
         };
 
-        const ADMIN = "jasim300v@gmail.com";
+        const ADMIN_MAIL = "jasim300v@gmail.com";
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.database();
+        const auth = firebase.auth();
 
-        function showAuth() { document.getElementById('auth-modal').style.display='flex'; }
-        function closeAuth() { document.getElementById('auth-modal').style.display='none'; }
+        // عرض وإخفاء نافذة الدخول
+        function showLogin() { document.getElementById('auth-modal').style.display = 'flex'; }
+        function hideLogin() { document.getElementById('auth-modal').style.display = 'none'; }
 
-        async function login() {
+        async function handleAuth() {
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
             try { await auth.signInWithEmailAndPassword(e, p); } 
             catch { await auth.createUserWithEmailAndPassword(e, p); }
-            closeAuth();
+            hideLogin();
         }
 
-        auth.onAuthStateChanged(user => {
-            const display = document.getElementById('user-display');
-            const upBtn = document.getElementById('up-btn');
-            if(user) {
-                display.innerHTML = `<i class="fas fa-circle text-[10px] text-green-500"></i> <span class="text-sm font-bold">${user.email === ADMIN ? 'المدير عبدالله ⭐' : user.email.split('@')[0]}</span> <button onclick="auth.signOut()" class="text-[10px] opacity-50">خروج</button>`;
-                upBtn.style.display = 'block';
-            } else {
-                display.innerHTML = `<i class="fas fa-user-circle text-2xl text-pink-500"></i> <button onclick="showAuth()" class="font-bold text-sm">تسجيل الدخول للأعضاء</button>`;
-                upBtn.style.display = 'none';
-            }
-        });
-
+        // الرفع
         const widget = cloudinary.createUploadWidget({cloudName: "dfscughol", uploadPreset: "update_vk"}, (err, res) => {
             if (res.event === "success") {
                 db.ref('posts').push({ url: res.info.secure_url, user: auth.currentUser.email, time: Date.now() });
             }
         });
-        function openWidget() { widget.open(); }
 
+        function checkAuthAndUpload() {
+            if (auth.currentUser) { widget.open(); } else { showLogin(); }
+        }
+
+        // جلب الفيديوهات (عام للجميع)
         db.ref('posts').on('value', snap => {
             const feed = document.getElementById('video-feed');
             feed.innerHTML = '';
             snap.forEach(child => {
                 const p = child.val();
-                const isMe = auth.currentUser && auth.currentUser.email === ADMIN;
+                const isMe = auth.currentUser && auth.currentUser.email === ADMIN_MAIL;
                 feed.innerHTML += `
-                    <div class="video-card">
+                    <div class="video-item">
                         <video src="${p.url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
-                        <div class="side-actions">
-                            <div class="action-btn"><i class="fas fa-heart text-pink-500"></i></div>
-                            <div class="action-btn"><i class="fas fa-comment"></i></div>
-                            ${isMe ? `<div class="action-btn bg-red-500/50" onclick="deletePost('${child.key}')"><i class="fas fa-trash"></i></div>` : ''}
+                        
+                        <div class="side-bar">
+                            <div class="action-unit"><i class="fas fa-heart"></i><span>11.3 ألف</span></div>
+                            <div class="action-unit"><i class="fas fa-comment-dots"></i><span>6</span></div>
+                            <div class="action-unit"><i class="fas fa-share"></i><span>مشاركة</span></div>
+                            ${isMe ? `<div class="action-unit text-red-500" onclick="deletePost('${child.key}')"><i class="fas fa-trash-alt"></i></div>` : ''}
                         </div>
-                        <div class="absolute left-5 bottom-24 text-white p-4 bg-black/20 backdrop-blur-md rounded-2xl border border-white/10">
-                            <p class="font-black italic text-lg text-pink-500">@${p.user.split('@')[0]}</p>
-                            <p class="text-xs opacity-70">XRAWS Community Member</p>
+
+                        <div class="video-footer">
+                            <span class="user-tag">@${p.user.split('@')[0]} ${p.user === ADMIN_MAIL ? '⭐' : ''}</span>
+                            <p class="description">مرحباً بكم في فيديو جديد على منصة XRAWS الخاصة بعبدالله جاسم! 🍑🔥</p>
                         </div>
                     </div>`;
             });
         });
 
-        function deletePost(id) { if(confirm("حذف؟")) db.ref('posts').child(id).remove(); }
+        function deletePost(id) { if(confirm("حذف الفيديو؟")) db.ref('posts').child(id).remove(); }
     </script>
 </body>
 </html>

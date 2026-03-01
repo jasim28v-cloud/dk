@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XRAWS PRESTIGE | عبدالله جاسم</title>
+    <title>XRAWS PUBLIC | عبدالله جاسم</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -12,114 +12,56 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Cairo:wght@400;700;900&display=swap');
-        
-        body, html { 
-            margin: 0; padding: 0; height: 100%; overflow: hidden; 
-            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
-            font-family: 'Cairo', sans-serif;
-        }
-
-        /* تأثير الزجاج الخلفي */
-        .glass-bg {
-            position: fixed; inset: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.1), transparent);
-            pointer-events: none; z-index: 1;
-        }
-
-        .video-container { 
-            height: 100vh; width: 100%; scroll-snap-type: y mandatory; 
-            overflow-y: scroll; scrollbar-width: none; position: relative; z-index: 2;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #050505; font-family: 'Cairo', sans-serif; }
+        .video-container { height: 100vh; width: 100%; scroll-snap-type: y mandatory; overflow-y: scroll; scrollbar-width: none; }
         .video-container::-webkit-scrollbar { display: none; }
-
-        .video-card { 
-            height: 100vh; width: 100%; scroll-snap-align: start; 
-            position: relative; display: flex; align-items: center; justify-content: center; 
-        }
-
+        .video-card { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
         video { height: 100%; width: 100%; object-fit: cover; }
-
-        /* البطاقة الزجاجية الجانبية */
-        .glass-sidebar {
-            position: absolute; right: 20px; bottom: 120px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 40px; padding: 20px 10px;
-            display: flex; flex-direction: column; gap: 25px;
-            color: white; align-items: center; z-index: 10;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        
+        /* الهوية الزجاجية العلوية */
+        .user-glass-card {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px;
+            padding: 10px 20px; color: white; display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* معلومات الفيديو الزجاجية */
-        .glass-info {
-            position: absolute; left: 20px; bottom: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 15px 25px; border-radius: 25px;
-            color: white; z-index: 10; max-width: 80%;
+        .side-actions { position: absolute; right: 20px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; z-index: 10; }
+        .action-btn { 
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
+            width: 50px; height: 50px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; color: white; border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .upload-btn { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white; padding: 12px 30px; border-radius: 50px; 
-            font-weight: 900; z-index: 100; display: none;
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        .auth-overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-            z-index: 2000; display: flex; align-items: center; justify-content: center; 
-            backdrop-filter: blur(20px);
-        }
-
-        .glass-login {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(25px);
-            padding: 40px; border-radius: 40px; width: 90%; max-width: 400px;
-            text-align: center; color: white;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        }
-
-        input {
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.2) !important;
-            color: white !important;
-            margin-bottom: 15px; border-radius: 15px; padding: 15px; width: 100%;
-            text-align: center; outline: none;
-        }
-
-        .admin-tag {
-            background: linear-gradient(90deg, #ff007f, #7a00ff);
-            padding: 2px 10px; border-radius: 8px; font-size: 10px; font-weight: bold;
+        .auth-modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(10px);
         }
     </style>
 </head>
 <body>
 
-    <div class="glass-bg"></div>
-
-    <div id="auth-screen" class="auth-overlay">
-        <div class="glass-login">
-            <h1 style="font-family: 'Orbitron';" class="text-4xl font-black mb-2 text-pink-500">XRAWS</h1>
-            <p class="text-gray-300 mb-8 text-sm">PRESTIGE COMMUNITY</p>
-            <input type="email" id="email" placeholder="البريد الإلكتروني">
-            <input type="password" id="pass" placeholder="كلمة السر">
-            <button onclick="login()" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 py-4 rounded-2xl font-black shadow-xl hover:scale-105 transition">دخول عالمي</button>
-        </div>
+    <div class="user-glass-card" id="user-display">
+        <i class="fas fa-user-circle text-2xl text-pink-500"></i>
+        <button onclick="showAuth()" class="font-bold text-sm">تسجيل الدخول للأعضاء</button>
     </div>
 
-    <button id="upload-btn" class="upload-btn" onclick="openWidget()">
-        <i class="fas fa-plus-circle mr-2"></i> SHARE MOMENT
+    <button id="up-btn" onclick="openWidget()" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 bg-white/20 backdrop-blur-xl border border-white/30 text-white px-8 py-3 rounded-full font-black hidden shadow-2xl">
+        + انشر فيديو
     </button>
-    
+
     <div class="video-container" id="video-feed"></div>
+
+    <div id="auth-modal" class="auth-modal">
+        <div class="bg-white/10 backdrop-blur-2xl p-10 rounded-[40px] border border-white/20 text-center w-80">
+            <h2 class="text-white font-black text-2xl mb-6 italic" style="font-family:Orbitron;">XRAWS</h2>
+            <input type="email" id="email" placeholder="البريد الإلكتروني" class="w-full bg-white/5 border border-white/20 p-3 rounded-xl mb-3 text-white text-center outline-none">
+            <input type="password" id="pass" placeholder="كلمة السر" class="w-full bg-white/5 border border-white/20 p-3 rounded-xl mb-6 text-white text-center outline-none">
+            <button onclick="login()" class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold">دخول / انضمام</button>
+            <button onclick="closeAuth()" class="text-gray-400 mt-4 text-xs">إغلاق</button>
+        </div>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -132,36 +74,39 @@
             appId: "1:636395398521:web:fbd094bd35a2883fda3ba8"
         };
 
-        const MY_EMAIL = "jasim300v@gmail.com";
+        const ADMIN = "jasim300v@gmail.com";
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
+        function showAuth() { document.getElementById('auth-modal').style.display='flex'; }
+        function closeAuth() { document.getElementById('auth-modal').style.display='none'; }
+
         async function login() {
             const e = document.getElementById('email').value;
             const p = document.getElementById('pass').value;
-            if(!e || !p) return;
             try { await auth.signInWithEmailAndPassword(e, p); } 
             catch { await auth.createUserWithEmailAndPassword(e, p); }
+            closeAuth();
         }
 
         auth.onAuthStateChanged(user => {
+            const display = document.getElementById('user-display');
+            const upBtn = document.getElementById('up-btn');
             if(user) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('upload-btn').style.display = 'block';
+                display.innerHTML = `<i class="fas fa-circle text-[10px] text-green-500"></i> <span class="text-sm font-bold">${user.email === ADMIN ? 'المدير عبدالله ⭐' : user.email.split('@')[0]}</span> <button onclick="auth.signOut()" class="text-[10px] opacity-50">خروج</button>`;
+                upBtn.style.display = 'block';
+            } else {
+                display.innerHTML = `<i class="fas fa-user-circle text-2xl text-pink-500"></i> <button onclick="showAuth()" class="font-bold text-sm">تسجيل الدخول للأعضاء</button>`;
+                upBtn.style.display = 'none';
             }
         });
 
         const widget = cloudinary.createUploadWidget({cloudName: "dfscughol", uploadPreset: "update_vk"}, (err, res) => {
             if (res.event === "success") {
-                db.ref('posts').push({
-                    url: res.info.secure_url,
-                    user: auth.currentUser.email,
-                    time: Date.now()
-                });
+                db.ref('posts').push({ url: res.info.secure_url, user: auth.currentUser.email, time: Date.now() });
             }
         });
-
         function openWidget() { widget.open(); }
 
         db.ref('posts').on('value', snap => {
@@ -169,28 +114,24 @@
             feed.innerHTML = '';
             snap.forEach(child => {
                 const p = child.val();
-                const isAdmin = auth.currentUser && auth.currentUser.email === MY_EMAIL;
+                const isMe = auth.currentUser && auth.currentUser.email === ADMIN;
                 feed.innerHTML += `
                     <div class="video-card">
                         <video src="${p.url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
-                        <div class="glass-sidebar">
-                            <div class="flex flex-col items-center"><i class="fas fa-heart text-2xl mb-1 text-pink-500"></i><span class="text-[10px]">99k</span></div>
-                            <div class="flex flex-col items-center"><i class="fas fa-comment text-2xl mb-1"></i><span class="text-[10px]">1.2k</span></div>
-                            <div class="flex flex-col items-center"><i class="fas fa-share text-2xl"></i></div>
-                            ${isAdmin ? `<i class="fas fa-trash-alt text-red-500 mt-4 cursor-pointer" onclick="deletePost('${child.key}')"></i>` : ''}
+                        <div class="side-actions">
+                            <div class="action-btn"><i class="fas fa-heart text-pink-500"></i></div>
+                            <div class="action-btn"><i class="fas fa-comment"></i></div>
+                            ${isMe ? `<div class="action-btn bg-red-500/50" onclick="deletePost('${child.key}')"><i class="fas fa-trash"></i></div>` : ''}
                         </div>
-                        <div class="glass-info">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="font-black text-lg italic">@${p.user.split('@')[0]}</span>
-                                ${p.user === MY_EMAIL ? '<span class="admin-tag">ADMIN</span>' : ''}
-                            </div>
-                            <p class="text-sm text-gray-200 opacity-80">تم الرفع في مجتمع XRAWS الحصري ✨</p>
+                        <div class="absolute left-5 bottom-24 text-white p-4 bg-black/20 backdrop-blur-md rounded-2xl border border-white/10">
+                            <p class="font-black italic text-lg text-pink-500">@${p.user.split('@')[0]}</p>
+                            <p class="text-xs opacity-70">XRAWS Community Member</p>
                         </div>
                     </div>`;
             });
         });
 
-        function deletePost(id) { if(confirm("حذف هذا المحتوى؟")) db.ref('posts').child(id).remove(); }
+        function deletePost(id) { if(confirm("حذف؟")) db.ref('posts').child(id).remove(); }
     </script>
 </body>
 </html>

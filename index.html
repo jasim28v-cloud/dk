@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XRAWS | Crimson Glass Edition</title>
+    <title>XRAWS PRESTIGE | عبدالله جاسم</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,92 +11,104 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Cairo:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Cairo:wght@400;700;900&display=swap');
         
-        body, html { 
-            margin: 0; padding: 0; height: 100%; overflow: hidden; 
-            background: #4a0404; /* أحمر داكن جداً خلفية */
-            font-family: 'Cairo', sans-serif;
-        }
-
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #3d0000; font-family: 'Cairo', sans-serif; }
         .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .feed::-webkit-scrollbar { display: none; }
-
-        .video-item { 
-            height: 100vh; width: 100%; scroll-snap-align: start; 
-            position: relative; display: flex; align-items: center; justify-content: center;
-        }
-
+        .video-item { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; }
         video { height: 100%; width: 100%; object-fit: cover; }
 
-        /* الأزرار الجانبية الزجاجية الحمراء */
-        .side-bar {
-            position: absolute; right: 15px; bottom: 120px;
-            display: flex; flex-direction: column; gap: 18px; z-index: 100;
+        /* الساعة الرقمية واسم الموقع */
+        .top-header {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
         }
+        .site-name { font-family: 'Orbitron'; font-size: 24px; color: #ff0000; text-shadow: 0 0 15px #ff0000; font-weight: 900; }
+        #digital-clock { font-family: 'Orbitron'; color: white; font-size: 18px; letter-spacing: 2px; }
 
+        /* الأزرار الجانبية الزجاجية */
+        .side-bar { position: absolute; right: 15px; bottom: 140px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
         .glass-btn {
-            background: rgba(255, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 55px; height: 55px; border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: white; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+            background: rgba(255, 0, 0, 0.2); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2); width: 60px; height: 60px;
+            border-radius: 50%; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; color: white; cursor: pointer; transition: 0.3s;
         }
-
-        .glass-btn:active { transform: scale(0.9); background: rgba(255, 0, 0, 0.5); }
         .glass-btn i { font-size: 24px; }
-        .glass-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; }
+        .glass-btn span { font-size: 11px; font-weight: bold; margin-top: 2px; }
 
-        /* معلومات الفيديو الزجاجية */
+        /* معلومات الفيديو */
         .video-info {
-            position: absolute; left: 15px; bottom: 30px; right: 80px;
-            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px);
+            position: absolute; left: 15px; bottom: 100px; right: 85px;
+            background: rgba(255, 0, 0, 0.1); backdrop-filter: blur(10px);
             padding: 15px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);
             color: white; z-index: 100;
         }
 
-        .user-tag { font-family: 'Orbitron'; color: #ff4d4d; font-weight: 900; font-size: 18px; }
-
-        /* الشريط السفلي الزجاجي */
-        .nav-glass {
-            position: fixed; bottom: 0; width: 100%; height: 70px;
-            background: rgba(139, 0, 0, 0.2); backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex; justify-content: space-around; align-items: center; z-index: 200;
-        }
-
-        .plus-main {
-            background: linear-gradient(45deg, #ff0000, #8b0000);
-            width: 50px; height: 50px; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 24px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-        }
-
-        /* نافذة التعليقات */
-        .comments-panel {
+        /* نافذة التعليقات الحقيقية */
+        .comments-tray {
             position: fixed; bottom: -100%; left: 0; width: 100%; height: 60%;
-            background: rgba(20, 0, 0, 0.95); backdrop-filter: blur(20px);
-            border-radius: 30px 30px 0 0; z-index: 1000; transition: 0.5s;
-            padding: 20px; color: white;
+            background: rgba(30, 0, 0, 0.98); backdrop-filter: blur(25px);
+            border-radius: 30px 30px 0 0; z-index: 2000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px; color: white; display: flex; flex-direction: column;
+        }
+        .comment-list { flex: 1; overflow-y: auto; margin-bottom: 20px; }
+        .comment-input-area { display: flex; gap: 10px; border-top: 1px solid #444; padding-top: 15px; }
+        .comment-input-area input { flex: 1; background: #222; border: 1px solid #ff0000; border-radius: 10px; padding: 10px; color: white; }
+
+        /* شريط الحقوق السفلي */
+        .footer-rights {
+            position: fixed; bottom: 75px; left: 0; width: 100%;
+            text-align: center; color: rgba(255,255,255,0.4); font-size: 10px; z-index: 100;
+        }
+
+        /* القلوب عند النقر */
+        .heart-pop {
+            position: absolute; pointer-events: none; color: #ff0000;
+            font-size: 50px; animation: heartBeat 0.8s ease-out forwards; z-index: 500;
+        }
+        @keyframes heartBeat {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; margin-top: -100px; }
+        }
+
+        .nav-bottom {
+            position: fixed; bottom: 0; width: 100%; height: 70px;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
+            border-top: 1px solid #ff000033; display: flex; justify-content: space-around; align-items: center; z-index: 500;
         }
     </style>
 </head>
 <body>
 
-    <div class="feed" id="video-feed"></div>
-
-    <div class="nav-glass">
-        <div class="text-white flex flex-col items-center"><i class="fas fa-home text-xl"></i><span class="text-[10px]">الرئيسية</span></div>
-        <div class="plus-main" onclick="widget.open()"><i class="fas fa-plus"></i></div>
-        <div class="text-white flex flex-col items-center" onclick="alert('قريباً الملف الشخصي')"><i class="fas fa-user text-xl text-red-500"></i><span class="text-[10px]">حسابي</span></div>
+    <div class="top-header">
+        <div class="site-name">XRAWS</div>
+        <div id="digital-clock">00:00:00</div>
     </div>
 
-    <div id="comment-box" class="comments-panel">
-        <div class="flex justify-between mb-4"><span>التعليقات</span><i class="fas fa-times" onclick="closeComments()"></i></div>
-        <div class="opacity-50 text-center mt-10">لا توجد تعليقات بعد.. كن الأول!</div>
+    <div class="feed" id="video-feed"></div>
+
+    <div class="footer-rights">تم إنتاج كل شيء بواسطة XRAWS Community © 2024</div>
+
+    <div class="nav-bottom">
+        <div class="text-white text-xl"><i class="fas fa-home"></i></div>
+        <div class="bg-red-600 w-12 h-10 rounded-xl flex items-center justify-center text-white" onclick="widget.open()"><i class="fas fa-plus"></i></div>
+        <div class="text-white text-xl" onclick="toggleComments()"><i class="fas fa-comment"></i></div>
+    </div>
+
+    <div id="comment-tray" class="comments-tray">
+        <div class="flex justify-between items-center mb-4">
+            <span class="font-bold">التعليقات الحقيقية</span>
+            <i class="fas fa-times text-2xl" onclick="toggleComments()"></i>
+        </div>
+        <div id="comment-list" class="comment-list"></div>
+        <div class="comment-input-area">
+            <input type="text" id="comment-input" placeholder="اكتب تعليقك هنا...">
+            <button onclick="postComment()" class="bg-red-600 px-4 py-2 rounded-xl">نشر</button>
+        </div>
     </div>
 
     <script>
@@ -114,23 +126,58 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
+        let currentPostId = "";
 
-        // أداة الرفع
+        // الساعة الرقمية
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-GB');
+        }, 1000);
+
+        // قلوب عند النقر على الفيديو
+        function spawnHeart(e) {
+            const heart = document.createElement('i');
+            heart.className = 'fas fa-heart heart-pop';
+            heart.style.left = (e.clientX - 25) + 'px';
+            heart.style.top = (e.clientY - 25) + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 800);
+        }
+
         const widget = cloudinary.createUploadWidget({cloudName: "dfscughol", uploadPreset: "update_vk"}, (err, res) => {
             if (res.event === "success") {
-                db.ref('posts').push({ 
-                    url: res.info.secure_url, 
-                    user: auth.currentUser ? auth.currentUser.email : "Zair_XRAWS", 
-                    likes: 0, time: Date.now() 
-                });
+                db.ref('posts').push({ url: res.info.secure_url, user: auth.currentUser ? auth.currentUser.email : "guest", likes: 0 });
             }
         });
 
-        // الأزرار الحقيقية
-        function doLike(id, current) { db.ref('posts/'+id).update({ likes: (current || 0) + 1 }); }
-        function openComments() { document.getElementById('comment-box').style.bottom = '0'; }
-        function closeComments() { document.getElementById('comment-box').style.bottom = '-100%'; }
-        function doShare(url) { navigator.clipboard.writeText(url); alert("تم نسخ رابط الفيديو! 🔗"); }
+        function toggleComments(id) {
+            const tray = document.getElementById('comment-tray');
+            if(id) {
+                currentPostId = id;
+                loadComments(id);
+                tray.style.bottom = '0';
+            } else {
+                tray.style.bottom = '-100%';
+            }
+        }
+
+        function loadComments(postId) {
+            db.ref('comments/' + postId).on('value', snap => {
+                const list = document.getElementById('comment-list');
+                list.innerHTML = '';
+                snap.forEach(child => {
+                    const c = child.val();
+                    list.innerHTML += `<div class="mb-3 p-3 bg-white/5 rounded-xl"><span class="text-red-400 font-bold block text-xs">@${c.user}</span><p class="text-sm">${c.text}</p></div>`;
+                });
+            });
+        }
+
+        function postComment() {
+            const txt = document.getElementById('comment-input').value;
+            if(!txt) return;
+            db.ref('comments/' + currentPostId).push({ text: txt, user: auth.currentUser ? auth.currentUser.email.split('@')[0] : 'عضو' });
+            document.getElementById('comment-input').value = '';
+        }
 
         db.ref('posts').on('value', snap => {
             const feed = document.getElementById('video-feed');
@@ -139,30 +186,18 @@
                 const p = child.val();
                 const id = child.key;
                 const isMe = auth.currentUser && auth.currentUser.email === ADMIN;
-                
                 feed.innerHTML += `
-                    <div class="video-item">
+                    <div class="video-item" onclick="spawnHeart(event)">
                         <video src="${p.url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
-                        
                         <div class="side-bar">
-                            <div class="glass-btn" onclick="doLike('${id}', ${p.likes})">
-                                <i class="fas fa-heart text-red-500"></i>
-                                <span>${p.likes || 0}</span>
-                            </div>
-                            <div class="glass-btn" onclick="openComments()">
-                                <i class="fas fa-comment-dots"></i>
-                                <span>12</span>
-                            </div>
-                            <div class="glass-btn" onclick="doShare('${p.url}')">
-                                <i class="fas fa-share"></i>
-                                <span>نشر</span>
-                            </div>
-                            ${isMe ? `<div class="glass-btn border-red-500" onclick="db.ref('posts/${id}').remove()"><i class="fas fa-trash text-red-500"></i></div>` : ''}
+                            <div class="glass-btn" onclick="db.ref('posts/${id}').update({likes: (p.likes||0)+1})"><i class="fas fa-heart text-red-500"></i><span>${p.likes||0}</span></div>
+                            <div class="glass-btn" onclick="toggleComments('${id}')"><i class="fas fa-comment-dots"></i><span>التعليقات</span></div>
+                            <div class="glass-btn" onclick="navigator.clipboard.writeText('${p.url}');alert('نسخ الرابط!')"><i class="fas fa-share"></i><span>نشر</span></div>
+                            ${isMe ? `<div class="glass-btn bg-red-900/50" onclick="db.ref('posts/${id}').remove()"><i class="fas fa-trash"></i></div>` : ''}
                         </div>
-
                         <div class="video-info">
-                            <span class="user-tag">@${p.user.split('@')[0]} ${p.user === ADMIN ? '⭐' : ''}</span>
-                            <p class="text-sm mt-1 opacity-80">مرحباً بك في عالم XRAWS الزجاجي الأحمر 🔥🍒</p>
+                            <div class="font-black text-red-500 mb-1">@${p.user.split('@')[0]} ${p.user===ADMIN?'⭐':''}</div>
+                            <div class="text-xs opacity-80">تم الإنتاج بواسطة مجتمع XRAWS الحصري</div>
                         </div>
                     </div>`;
             });

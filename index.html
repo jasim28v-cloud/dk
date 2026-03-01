@@ -3,69 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XRAWS COMMUNITY | عبدالله جاسم</title>
-
+    <title>XRAWS PRESTIGE | عبدالله جاسم</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Cairo:wght@400;700;900&display=swap');
-        :root { --pink: #ff007f; --soft-pink: #fff0f5; }
-        body { background: var(--soft-pink); font-family: 'Cairo', sans-serif; margin: 0; }
-        header { 
-            height: 70px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); 
-            border-bottom: 2px solid var(--pink); position: fixed; width: 100%; top: 0; z-index: 1000;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+        
+        body, html { 
+            margin: 0; padding: 0; height: 100%; overflow: hidden; 
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Cairo', sans-serif;
         }
-        .v-card { 
-            background: white; border-radius: 30px; overflow: hidden; margin-bottom: 25px; 
-            box-shadow: 0 15px 35px rgba(255, 0, 127, 0.08); width: 100%; max-width: 480px;
+
+        /* تأثير الزجاج الخلفي */
+        .glass-bg {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.1), transparent);
+            pointer-events: none; z-index: 1;
         }
-        .user-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--pink); object-fit: cover; cursor: pointer; }
-        .modal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
-            z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+
+        .video-container { 
+            height: 100vh; width: 100%; scroll-snap-type: y mandatory; 
+            overflow-y: scroll; scrollbar-width: none; position: relative; z-index: 2;
         }
-        .auth-box { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; }
-        input { width: 100%; border: 2px solid #ffe4e1; padding: 12px; border-radius: 15px; margin-bottom: 15px; text-align: center; }
-        .btn-main { background: var(--pink); color: white; padding: 12px 25px; border-radius: 15px; font-weight: bold; width: 100%; border: none; cursor: pointer; }
-        #upload-trigger {
-            position: fixed; bottom: 30px; left: 30px; width: 65px; height: 65px;
-            background: var(--pink); color: white; border-radius: 50%; display: none;
-            align-items: center; justify-content: center; font-size: 24px; z-index: 1500;
-            box-shadow: 0 10px 20px rgba(255, 0, 127, 0.4);
+        .video-container::-webkit-scrollbar { display: none; }
+
+        .video-card { 
+            height: 100vh; width: 100%; scroll-snap-align: start; 
+            position: relative; display: flex; align-items: center; justify-content: center; 
+        }
+
+        video { height: 100%; width: 100%; object-fit: cover; }
+
+        /* البطاقة الزجاجية الجانبية */
+        .glass-sidebar {
+            position: absolute; right: 20px; bottom: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 40px; padding: 20px 10px;
+            display: flex; flex-direction: column; gap: 25px;
+            color: white; align-items: center; z-index: 10;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* معلومات الفيديو الزجاجية */
+        .glass-info {
+            position: absolute; left: 20px; bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 25px; border-radius: 25px;
+            color: white; z-index: 10; max-width: 80%;
+        }
+
+        .upload-btn { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white; padding: 12px 30px; border-radius: 50px; 
+            font-weight: 900; z-index: 100; display: none;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .auth-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
+            z-index: 2000; display: flex; align-items: center; justify-content: center; 
+            backdrop-filter: blur(20px);
+        }
+
+        .glass-login {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(25px);
+            padding: 40px; border-radius: 40px; width: 90%; max-width: 400px;
+            text-align: center; color: white;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        input {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            color: white !important;
+            margin-bottom: 15px; border-radius: 15px; padding: 15px; width: 100%;
+            text-align: center; outline: none;
+        }
+
+        .admin-tag {
+            background: linear-gradient(90deg, #ff007f, #7a00ff);
+            padding: 2px 10px; border-radius: 8px; font-size: 10px; font-weight: bold;
         }
     </style>
 </head>
-<body class="pt-24 flex flex-col items-center pb-10">
+<body>
 
-    <header>
-        <div class="text-pink-600 font-black text-2xl" style="font-family:Orbitron;">XRAWS</div>
-        <div id="nav-user">
-            <button onclick="toggleModal('auth-modal')" class="border-2 border-pink-500 text-pink-500 px-5 py-1.5 rounded-full font-bold">دخول</button>
-        </div>
-    </header>
+    <div class="glass-bg"></div>
 
-    <main id="video-feed" class="w-full flex flex-col items-center px-4"></main>
-
-    <div id="auth-modal" class="modal">
-        <div class="auth-box">
-            <h2 class="text-2xl font-black mb-6 text-pink-600">انضم إلينا 💖</h2>
-            <input type="email" id="auth-email" placeholder="البريد الإلكتروني">
-            <input type="password" id="auth-pass" placeholder="كلمة السر">
-            <button onclick="handleAuth()" class="btn-main">دخول / تسجيل جديد</button>
-            <button onclick="toggleModal('auth-modal')" class="mt-4 text-gray-400 block w-full text-center">إغلاق</button>
+    <div id="auth-screen" class="auth-overlay">
+        <div class="glass-login">
+            <h1 style="font-family: 'Orbitron';" class="text-4xl font-black mb-2 text-pink-500">XRAWS</h1>
+            <p class="text-gray-300 mb-8 text-sm">PRESTIGE COMMUNITY</p>
+            <input type="email" id="email" placeholder="البريد الإلكتروني">
+            <input type="password" id="pass" placeholder="كلمة السر">
+            <button onclick="login()" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 py-4 rounded-2xl font-black shadow-xl hover:scale-105 transition">دخول عالمي</button>
         </div>
     </div>
 
-    <button id="upload-trigger"><i class="fas fa-plus"></i></button>
+    <button id="upload-btn" class="upload-btn" onclick="openWidget()">
+        <i class="fas fa-plus-circle mr-2"></i> SHARE MOMENT
+    </button>
+    
+    <div class="video-container" id="video-feed"></div>
 
     <script>
-        // إعدادات Firebase الخاصة بمشروع soko
         const firebaseConfig = {
             apiKey: "AIzaSyD93aEghXrgkTYRKnQ98rVe1Fu9NdngcxY",
             authDomain: "soko-7d03e.firebaseapp.com",
@@ -76,83 +132,65 @@
             appId: "1:636395398521:web:fbd094bd35a2883fda3ba8"
         };
 
-        const ADMIN_EMAIL = "jasim300v@gmail.com";
-
+        const MY_EMAIL = "jasim300v@gmail.com";
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        function toggleModal(id) {
-            const m = document.getElementById(id);
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+        async function login() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('pass').value;
+            if(!e || !p) return;
+            try { await auth.signInWithEmailAndPassword(e, p); } 
+            catch { await auth.createUserWithEmailAndPassword(e, p); }
         }
 
         auth.onAuthStateChanged(user => {
-            const navUser = document.getElementById('nav-user');
-            const upBtn = document.getElementById('upload-trigger');
-            if (user) {
-                navUser.innerHTML = `<img src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="user-avatar" onclick="updateUserPic()">`;
-                upBtn.style.display = 'flex';
-                document.getElementById('auth-modal').style.display = 'none';
-            } else {
-                navUser.innerHTML = `<button onclick="toggleModal('auth-modal')" class="border-2 border-pink-500 text-pink-500 px-5 py-1.5 rounded-full font-bold">دخول</button>`;
-                upBtn.style.display = 'none';
+            if(user) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('upload-btn').style.display = 'block';
             }
         });
 
-        async function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
-            try {
-                await auth.signInWithEmailAndPassword(email, pass);
-            } catch (err) {
-                if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-                    await auth.createUserWithEmailAndPassword(email, pass);
-                } else { alert(err.message); }
-            }
-        }
-
-        function updateUserPic() {
-            const url = prompt("ضع رابط صورتك الشخصية:");
-            if(url) auth.currentUser.updateProfile({ photoURL: url }).then(() => location.reload());
-        }
-
-        const widget = cloudinary.createUploadWidget({ cloudName: "dfscughol", uploadPreset: "update_vk" }, (err, res) => {
+        const widget = cloudinary.createUploadWidget({cloudName: "dfscughol", uploadPreset: "update_vk"}, (err, res) => {
             if (res.event === "success") {
                 db.ref('posts').push({
                     url: res.info.secure_url,
-                    user: auth.currentUser.email.split('@')[0],
-                    userPic: auth.currentUser.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
-                    userId: auth.currentUser.uid,
+                    user: auth.currentUser.email,
                     time: Date.now()
                 });
             }
         });
-        document.getElementById('upload-trigger').onclick = () => widget.open();
+
+        function openWidget() { widget.open(); }
 
         db.ref('posts').on('value', snap => {
             const feed = document.getElementById('video-feed');
             feed.innerHTML = '';
-            const data = snap.val();
-            if(!data) return;
-            Object.keys(data).reverse().forEach(id => {
-                const p = data[id];
-                const isAdmin = auth.currentUser && auth.currentUser.email === ADMIN_EMAIL;
+            snap.forEach(child => {
+                const p = child.val();
+                const isAdmin = auth.currentUser && auth.currentUser.email === MY_EMAIL;
                 feed.innerHTML += `
-                    <div class="v-card">
-                        <div class="p-4 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <img src="${p.userPic}" class="w-10 h-10 rounded-full">
-                                <span class="font-bold text-gray-700">${p.user}</span>
-                            </div>
-                            ${isAdmin ? `<i class="fas fa-trash text-red-500 cursor-pointer" onclick="deletePost('${id}')"></i>` : ''}
+                    <div class="video-card">
+                        <video src="${p.url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
+                        <div class="glass-sidebar">
+                            <div class="flex flex-col items-center"><i class="fas fa-heart text-2xl mb-1 text-pink-500"></i><span class="text-[10px]">99k</span></div>
+                            <div class="flex flex-col items-center"><i class="fas fa-comment text-2xl mb-1"></i><span class="text-[10px]">1.2k</span></div>
+                            <div class="flex flex-col items-center"><i class="fas fa-share text-2xl"></i></div>
+                            ${isAdmin ? `<i class="fas fa-trash-alt text-red-500 mt-4 cursor-pointer" onclick="deletePost('${child.key}')"></i>` : ''}
                         </div>
-                        <video src="${p.url}" controls class="w-full bg-black"></video>
+                        <div class="glass-info">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="font-black text-lg italic">@${p.user.split('@')[0]}</span>
+                                ${p.user === MY_EMAIL ? '<span class="admin-tag">ADMIN</span>' : ''}
+                            </div>
+                            <p class="text-sm text-gray-200 opacity-80">تم الرفع في مجتمع XRAWS الحصري ✨</p>
+                        </div>
                     </div>`;
             });
         });
 
-        function deletePost(id) { if(confirm("حذف؟")) db.ref(`posts/${id}`).remove(); }
+        function deletePost(id) { if(confirm("حذف هذا المحتوى؟")) db.ref('posts').child(id).remove(); }
     </script>
 </body>
 </html>

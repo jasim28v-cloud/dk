@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XRAWS | TikTok Style</title>
+    <title>XRAWS | Purple Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,9 +11,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Cairo', sans-serif; }
+        /* تغيير الخلفية إلى أرجواني باهت احترافي */
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #2d1b4d; font-family: 'Cairo', sans-serif; }
         
-        /* حاوية الفيديوهات - سحب عمودي */
         .feed {
             height: 100vh;
             overflow-y: scroll;
@@ -27,7 +27,7 @@
             width: 100%;
             scroll-snap-align: start;
             position: relative;
-            background: #000;
+            background: #2d1b4d; /* لون أرجواني عميق خلف الفيديو */
         }
 
         video {
@@ -36,7 +36,6 @@
             object-fit: cover;
         }
 
-        /* الأزرار الجانبية (مثل الصورة التي أرفقتها) */
         .side-bar {
             position: absolute;
             right: 15px;
@@ -67,7 +66,6 @@
             margin-top: 4px;
         }
 
-        /* معلومات الفيديو بالأسفل */
         .video-footer {
             position: absolute;
             left: 15px;
@@ -78,59 +76,58 @@
             text-align: right;
         }
 
-        .user-tag { font-weight: 900; font-size: 18px; margin-bottom: 5px; display: block; }
-        .description { font-size: 14px; opacity: 0.9; line-height: 1.4; }
+        .user-tag { font-weight: 900; font-size: 18px; margin-bottom: 5px; display: block; color: #d8b4fe; }
+        .description { font-size: 14px; opacity: 0.9; }
 
-        /* شريط التنقل السفلي الاحترافي */
+        /* شريط سفلي متناسق مع اللون الأرجواني */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             width: 100%;
             height: 60px;
-            background: black;
-            border-top: 0.5px solid rgba(255,255,255,0.2);
+            background: #1a0f2e;
+            border-top: 0.5px solid rgba(216, 180, 254, 0.2);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 200;
         }
 
-        .nav-icon { color: white; font-size: 20px; display: flex; flex-direction: column; align-items: center; }
+        .nav-icon { color: #d8b4fe; font-size: 20px; display: flex; flex-direction: column; align-items: center; }
         .nav-icon span { font-size: 10px; margin-top: 2px; }
-        .plus-btn { background: white; color: black !important; padding: 5px 15px; border-radius: 10px; font-weight: bold; }
+        .plus-btn { background: #d8b4fe; color: #1a0f2e !important; padding: 5px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        /* نافذة تسجيل الدخول الزجاجية */
+        /* نافذة الدخول */
         .auth-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            position: fixed; inset: 0; background: rgba(26, 15, 46, 0.9);
             z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px);
         }
-        .login-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 30px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; color: white; }
-        input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 12px; margin-bottom: 10px; color: white; text-align: center; }
+        .login-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(216, 180, 254, 0.2); padding: 30px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; color: white; }
+        input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(216, 180, 254, 0.2); padding: 12px; border-radius: 12px; margin-bottom: 10px; color: white; text-align: center; outline: none; }
     </style>
 </head>
 <body>
 
     <div class="fixed top-0 w-full flex justify-center py-4 z-50 text-white font-bold opacity-70">
-        <span>اتبع | لك</span>
+        <span class="text-[#d8b4fe]">XRAWS | عام</span>
     </div>
 
-    <div class="feed" id="video-feed">
-        </div>
+    <div class="feed" id="video-feed"></div>
 
     <div class="bottom-nav">
         <div class="nav-icon"><i class="fas fa-home"></i><span>الرئيسية</span></div>
         <div class="nav-icon"><i class="fas fa-search"></i><span>اكتشف</span></div>
-        <div class="nav-icon plus-btn" id="plus-action" onclick="checkAuthAndUpload()"><i class="fas fa-plus"></i></div>
+        <div class="nav-icon plus-btn" id="plus-action" onclick="openUploadWidget()"><i class="fas fa-plus"></i></div>
         <div class="nav-icon"><i class="fas fa-comment-dots"></i><span>الرسائل</span></div>
         <div class="nav-icon" id="profile-btn" onclick="showLogin()"><i class="fas fa-user"></i><span>الملف</span></div>
     </div>
 
     <div id="auth-modal" class="auth-overlay">
         <div class="login-card">
-            <h2 class="text-2xl font-black mb-6">انضم إلى XRAWS</h2>
+            <h2 class="text-2xl font-black mb-6 text-[#d8b4fe]">دخول الأعضاء</h2>
             <input type="email" id="email" placeholder="البريد الإلكتروني">
             <input type="password" id="pass" placeholder="كلمة السر">
-            <button onclick="handleAuth()" class="w-full bg-white text-black font-bold py-3 rounded-xl mt-2">تسجيل دخول</button>
+            <button onclick="handleAuth()" class="w-full bg-[#d8b4fe] text-[#1a0f2e] font-bold py-3 rounded-xl mt-2">دخول</button>
             <button onclick="hideLogin()" class="text-xs mt-4 opacity-60">إغلاق</button>
         </div>
     </div>
@@ -151,7 +148,6 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // عرض وإخفاء نافذة الدخول
         function showLogin() { document.getElementById('auth-modal').style.display = 'flex'; }
         function hideLogin() { document.getElementById('auth-modal').style.display = 'none'; }
 
@@ -163,18 +159,27 @@
             hideLogin();
         }
 
-        // الرفع
-        const widget = cloudinary.createUploadWidget({cloudName: "dfscughol", uploadPreset: "update_vk"}, (err, res) => {
+        // أداة الرفع
+        const widget = cloudinary.createUploadWidget({
+            cloudName: "dfscughol", 
+            uploadPreset: "update_vk"
+        }, (err, res) => {
             if (res.event === "success") {
-                db.ref('posts').push({ url: res.info.secure_url, user: auth.currentUser.email, time: Date.now() });
+                // إذا لم يكن مسجل دخول، يرفع باسم "زائر"
+                const userMail = auth.currentUser ? auth.currentUser.email : "guest@xraws.com";
+                db.ref('posts').push({ 
+                    url: res.info.secure_url, 
+                    user: userMail, 
+                    time: Date.now() 
+                });
             }
         });
 
-        function checkAuthAndUpload() {
-            if (auth.currentUser) { widget.open(); } else { showLogin(); }
+        // جعل زر الرفع يعمل للعام والأعضاء
+        function openUploadWidget() {
+            widget.open();
         }
 
-        // جلب الفيديوهات (عام للجميع)
         db.ref('posts').on('value', snap => {
             const feed = document.getElementById('video-feed');
             feed.innerHTML = '';
@@ -186,21 +191,21 @@
                         <video src="${p.url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
                         
                         <div class="side-bar">
-                            <div class="action-unit"><i class="fas fa-heart"></i><span>11.3 ألف</span></div>
+                            <div class="action-unit"><i class="fas fa-heart text-[#d8b4fe]"></i><span>11.3K</span></div>
                             <div class="action-unit"><i class="fas fa-comment-dots"></i><span>6</span></div>
-                            <div class="action-unit"><i class="fas fa-share"></i><span>مشاركة</span></div>
-                            ${isMe ? `<div class="action-unit text-red-500" onclick="deletePost('${child.key}')"><i class="fas fa-trash-alt"></i></div>` : ''}
+                            <div class="action-unit"><i class="fas fa-share"></i><span>نشر</span></div>
+                            ${isMe ? `<div class="action-unit text-red-400" onclick="deletePost('${child.key}')"><i class="fas fa-trash-alt"></i></div>` : ''}
                         </div>
 
                         <div class="video-footer">
                             <span class="user-tag">@${p.user.split('@')[0]} ${p.user === ADMIN_MAIL ? '⭐' : ''}</span>
-                            <p class="description">مرحباً بكم في فيديو جديد على منصة XRAWS الخاصة بعبدالله جاسم! 🍑🔥</p>
+                            <p class="description">محتوى حصري على منصة XRAWS الأرجوانية 💜✨</p>
                         </div>
                     </div>`;
             });
         });
 
-        function deletePost(id) { if(confirm("حذف الفيديو؟")) db.ref('posts').child(id).remove(); }
+        function deletePost(id) { if(confirm("حذف الفيديو نهائياً؟")) db.ref('posts').child(id).remove(); }
     </script>
 </body>
 </html>

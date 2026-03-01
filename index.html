@@ -24,7 +24,6 @@
         .v-card { 
             background: white; border-radius: 30px; overflow: hidden; margin-bottom: 25px; 
             box-shadow: 0 15px 35px rgba(255, 0, 127, 0.08); width: 100%; max-width: 480px;
-            border: 1px solid rgba(255, 0, 127, 0.1);
         }
         .user-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--pink); object-fit: cover; cursor: pointer; }
         .modal { 
@@ -32,25 +31,22 @@
             z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);
         }
         .auth-box { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; }
-        input { 
-            width: 100%; border: 2px solid #ffe4e1; padding: 12px; border-radius: 15px; 
-            margin-bottom: 15px; outline: none; transition: 0.3s; text-align: center;
-        }
+        input { width: 100%; border: 2px solid #ffe4e1; padding: 12px; border-radius: 15px; margin-bottom: 15px; text-align: center; }
         .btn-main { background: var(--pink); color: white; padding: 12px 25px; border-radius: 15px; font-weight: bold; width: 100%; border: none; cursor: pointer; }
         #upload-trigger {
             position: fixed; bottom: 30px; left: 30px; width: 65px; height: 65px;
             background: var(--pink); color: white; border-radius: 50%; display: none;
             align-items: center; justify-content: center; font-size: 24px; z-index: 1500;
-            box-shadow: 0 10px 20px rgba(255, 0, 127, 0.4); border: none; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255, 0, 127, 0.4);
         }
     </style>
 </head>
 <body class="pt-24 flex flex-col items-center pb-10">
 
     <header>
-        <div class="text-pink-600 font-black text-2xl tracking-tighter" style="font-family:Orbitron;">XRAWS</div>
+        <div class="text-pink-600 font-black text-2xl" style="font-family:Orbitron;">XRAWS</div>
         <div id="nav-user">
-            <button onclick="toggleModal('auth-modal')" class="border-2 border-pink-500 text-pink-500 px-5 py-1.5 rounded-full font-bold text-sm">دخول</button>
+            <button onclick="toggleModal('auth-modal')" class="border-2 border-pink-500 text-pink-500 px-5 py-1.5 rounded-full font-bold">دخول</button>
         </div>
     </header>
 
@@ -69,7 +65,7 @@
     <button id="upload-trigger"><i class="fas fa-plus"></i></button>
 
     <script>
-        // إعدادات Firebase الخاصة بك التي استخرجتها للتو
+        // إعدادات Firebase الخاصة بمشروع soko
         const firebaseConfig = {
             apiKey: "AIzaSyD93aEghXrgkTYRKnQ98rVe1Fu9NdngcxY",
             authDomain: "soko-7d03e.firebaseapp.com",
@@ -91,55 +87,37 @@
             m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        // مراقبة حالة المستخدم
         auth.onAuthStateChanged(user => {
             const navUser = document.getElementById('nav-user');
             const upBtn = document.getElementById('upload-trigger');
             if (user) {
-                navUser.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <img src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="user-avatar" onclick="updateUserPic()">
-                        <button onclick="auth.signOut()" class="text-xs text-pink-600 font-bold">خروج</button>
-                    </div>`;
+                navUser.innerHTML = `<img src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="user-avatar" onclick="updateUserPic()">`;
                 upBtn.style.display = 'flex';
                 document.getElementById('auth-modal').style.display = 'none';
             } else {
-                navUser.innerHTML = `<button onclick="toggleModal('auth-modal')" class="border-2 border-pink-500 text-pink-500 px-5 py-1.5 rounded-full font-bold text-sm">دخول</button>`;
+                navUser.innerHTML = `<button onclick="toggleModal('auth-modal')" class="border-2 border-pink-500 text-pink-500 px-5 py-1.5 rounded-full font-bold">دخول</button>`;
                 upBtn.style.display = 'none';
             }
         });
 
-        // نظام الدخول والتسجيل
         async function handleAuth() {
             const email = document.getElementById('auth-email').value;
             const pass = document.getElementById('auth-pass').value;
-            if(!email || !pass) return alert("يرجى ملء البيانات");
             try {
                 await auth.signInWithEmailAndPassword(email, pass);
             } catch (err) {
                 if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
                     await auth.createUserWithEmailAndPassword(email, pass);
-                    alert("تم إنشاء حسابك! يمكنك الآن رفع الفيديوهات.");
-                } else { alert("خطأ: " + err.message); }
+                } else { alert(err.message); }
             }
         }
 
-        // تحديث صورة البروفايل
         function updateUserPic() {
-            const url = prompt("ضع رابط صورتك الشخصية الجديدة:");
-            if(url) {
-                auth.currentUser.updateProfile({ photoURL: url }).then(() => {
-                    alert("تم تحديث الصورة!");
-                    location.reload();
-                });
-            }
+            const url = prompt("ضع رابط صورتك الشخصية:");
+            if(url) auth.currentUser.updateProfile({ photoURL: url }).then(() => location.reload());
         }
 
-        // إعداد Cloudinary للرفع
-        const widget = cloudinary.createUploadWidget({ 
-            cloudName: "dfscughol", 
-            uploadPreset: "update_vk" 
-        }, (err, res) => {
+        const widget = cloudinary.createUploadWidget({ cloudName: "dfscughol", uploadPreset: "update_vk" }, (err, res) => {
             if (res.event === "success") {
                 db.ref('posts').push({
                     url: res.info.secure_url,
@@ -152,7 +130,6 @@
         });
         document.getElementById('upload-trigger').onclick = () => widget.open();
 
-        // عرض الفيديوهات من قاعدة البيانات
         db.ref('posts').on('value', snap => {
             const feed = document.getElementById('video-feed');
             feed.innerHTML = '';
@@ -165,23 +142,17 @@
                     <div class="v-card">
                         <div class="p-4 flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <img src="${p.userPic}" class="w-10 h-10 rounded-full border border-pink-100">
+                                <img src="${p.userPic}" class="w-10 h-10 rounded-full">
                                 <span class="font-bold text-gray-700">${p.user}</span>
                             </div>
-                            ${isAdmin ? `<i class="fas fa-trash text-gray-400 hover:text-red-500 cursor-pointer" onclick="deletePost('${id}')"></i>` : ''}
+                            ${isAdmin ? `<i class="fas fa-trash text-red-500 cursor-pointer" onclick="deletePost('${id}')"></i>` : ''}
                         </div>
-                        <video src="${p.url}" controls class="w-full aspect-square bg-black"></video>
-                        <div class="p-4 flex gap-6 text-pink-500 text-xl">
-                            <i class="far fa-heart cursor-pointer"></i>
-                            <i class="far fa-comment cursor-pointer"></i>
-                            <i class="fas fa-share-alt cursor-pointer ml-auto"></i>
-                        </div>
+                        <video src="${p.url}" controls class="w-full bg-black"></video>
                     </div>`;
             });
         });
 
-        // وظيفة الحذف للمدير
-        function deletePost(id) { if(confirm("حذف هذا الفيديو نهائياً؟")) db.ref(`posts/${id}`).remove(); }
+        function deletePost(id) { if(confirm("حذف؟")) db.ref(`posts/${id}`).remove(); }
     </script>
 </body>
 </html>

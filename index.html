@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XRAWS | Purple Edition</title>
+    <title>XRAWS | Crimson Glass Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,125 +11,92 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* تغيير الخلفية إلى أرجواني باهت احترافي */
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #2d1b4d; font-family: 'Cairo', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Cairo:wght@400;700;900&display=swap');
         
-        .feed {
-            height: 100vh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scrollbar-width: none;
+        body, html { 
+            margin: 0; padding: 0; height: 100%; overflow: hidden; 
+            background: #4a0404; /* أحمر داكن جداً خلفية */
+            font-family: 'Cairo', sans-serif;
         }
+
+        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .feed::-webkit-scrollbar { display: none; }
 
-        .video-item {
-            height: 100vh;
-            width: 100%;
-            scroll-snap-align: start;
-            position: relative;
-            background: #2d1b4d; /* لون أرجواني عميق خلف الفيديو */
+        .video-item { 
+            height: 100vh; width: 100%; scroll-snap-align: start; 
+            position: relative; display: flex; align-items: center; justify-content: center;
         }
 
-        video {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-        }
+        video { height: 100%; width: 100%; object-fit: cover; }
 
+        /* الأزرار الجانبية الزجاجية الحمراء */
         .side-bar {
-            position: absolute;
-            right: 15px;
-            bottom: 150px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            z-index: 100;
+            position: absolute; right: 15px; bottom: 120px;
+            display: flex; flex-direction: column; gap: 18px; z-index: 100;
         }
 
-        .action-unit {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
+        .glass-btn {
+            background: rgba(255, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 55px; height: 55px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
         }
 
-        .action-unit i {
-            font-size: 28px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            cursor: pointer;
+        .glass-btn:active { transform: scale(0.9); background: rgba(255, 0, 0, 0.5); }
+        .glass-btn i { font-size: 24px; }
+        .glass-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; }
+
+        /* معلومات الفيديو الزجاجية */
+        .video-info {
+            position: absolute; left: 15px; bottom: 30px; right: 80px;
+            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px);
+            padding: 15px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; z-index: 100;
         }
 
-        .action-unit span {
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 4px;
+        .user-tag { font-family: 'Orbitron'; color: #ff4d4d; font-weight: 900; font-size: 18px; }
+
+        /* الشريط السفلي الزجاجي */
+        .nav-glass {
+            position: fixed; bottom: 0; width: 100%; height: 70px;
+            background: rgba(139, 0, 0, 0.2); backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; justify-content: space-around; align-items: center; z-index: 200;
         }
 
-        .video-footer {
-            position: absolute;
-            left: 15px;
-            bottom: 30px;
-            right: 80px;
-            color: white;
-            z-index: 100;
-            text-align: right;
+        .plus-main {
+            background: linear-gradient(45deg, #ff0000, #8b0000);
+            width: 50px; height: 50px; border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 24px; box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
         }
 
-        .user-tag { font-weight: 900; font-size: 18px; margin-bottom: 5px; display: block; color: #d8b4fe; }
-        .description { font-size: 14px; opacity: 0.9; }
-
-        /* شريط سفلي متناسق مع اللون الأرجواني */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 60px;
-            background: #1a0f2e;
-            border-top: 0.5px solid rgba(216, 180, 254, 0.2);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 200;
+        /* نافذة التعليقات */
+        .comments-panel {
+            position: fixed; bottom: -100%; left: 0; width: 100%; height: 60%;
+            background: rgba(20, 0, 0, 0.95); backdrop-filter: blur(20px);
+            border-radius: 30px 30px 0 0; z-index: 1000; transition: 0.5s;
+            padding: 20px; color: white;
         }
-
-        .nav-icon { color: #d8b4fe; font-size: 20px; display: flex; flex-direction: column; align-items: center; }
-        .nav-icon span { font-size: 10px; margin-top: 2px; }
-        .plus-btn { background: #d8b4fe; color: #1a0f2e !important; padding: 5px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        /* نافذة الدخول */
-        .auth-overlay {
-            position: fixed; inset: 0; background: rgba(26, 15, 46, 0.9);
-            z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px);
-        }
-        .login-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(216, 180, 254, 0.2); padding: 30px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; color: white; }
-        input { width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(216, 180, 254, 0.2); padding: 12px; border-radius: 12px; margin-bottom: 10px; color: white; text-align: center; outline: none; }
     </style>
 </head>
 <body>
 
-    <div class="fixed top-0 w-full flex justify-center py-4 z-50 text-white font-bold opacity-70">
-        <span class="text-[#d8b4fe]">XRAWS | عام</span>
-    </div>
-
     <div class="feed" id="video-feed"></div>
 
-    <div class="bottom-nav">
-        <div class="nav-icon"><i class="fas fa-home"></i><span>الرئيسية</span></div>
-        <div class="nav-icon"><i class="fas fa-search"></i><span>اكتشف</span></div>
-        <div class="nav-icon plus-btn" id="plus-action" onclick="openUploadWidget()"><i class="fas fa-plus"></i></div>
-        <div class="nav-icon"><i class="fas fa-comment-dots"></i><span>الرسائل</span></div>
-        <div class="nav-icon" id="profile-btn" onclick="showLogin()"><i class="fas fa-user"></i><span>الملف</span></div>
+    <div class="nav-glass">
+        <div class="text-white flex flex-col items-center"><i class="fas fa-home text-xl"></i><span class="text-[10px]">الرئيسية</span></div>
+        <div class="plus-main" onclick="widget.open()"><i class="fas fa-plus"></i></div>
+        <div class="text-white flex flex-col items-center" onclick="alert('قريباً الملف الشخصي')"><i class="fas fa-user text-xl text-red-500"></i><span class="text-[10px]">حسابي</span></div>
     </div>
 
-    <div id="auth-modal" class="auth-overlay">
-        <div class="login-card">
-            <h2 class="text-2xl font-black mb-6 text-[#d8b4fe]">دخول الأعضاء</h2>
-            <input type="email" id="email" placeholder="البريد الإلكتروني">
-            <input type="password" id="pass" placeholder="كلمة السر">
-            <button onclick="handleAuth()" class="w-full bg-[#d8b4fe] text-[#1a0f2e] font-bold py-3 rounded-xl mt-2">دخول</button>
-            <button onclick="hideLogin()" class="text-xs mt-4 opacity-60">إغلاق</button>
-        </div>
+    <div id="comment-box" class="comments-panel">
+        <div class="flex justify-between mb-4"><span>التعليقات</span><i class="fas fa-times" onclick="closeComments()"></i></div>
+        <div class="opacity-50 text-center mt-10">لا توجد تعليقات بعد.. كن الأول!</div>
     </div>
 
     <script>
@@ -143,69 +110,63 @@
             appId: "1:636395398521:web:fbd094bd35a2883fda3ba8"
         };
 
-        const ADMIN_MAIL = "jasim300v@gmail.com";
+        const ADMIN = "jasim300v@gmail.com";
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
 
-        function showLogin() { document.getElementById('auth-modal').style.display = 'flex'; }
-        function hideLogin() { document.getElementById('auth-modal').style.display = 'none'; }
-
-        async function handleAuth() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('pass').value;
-            try { await auth.signInWithEmailAndPassword(e, p); } 
-            catch { await auth.createUserWithEmailAndPassword(e, p); }
-            hideLogin();
-        }
-
         // أداة الرفع
-        const widget = cloudinary.createUploadWidget({
-            cloudName: "dfscughol", 
-            uploadPreset: "update_vk"
-        }, (err, res) => {
+        const widget = cloudinary.createUploadWidget({cloudName: "dfscughol", uploadPreset: "update_vk"}, (err, res) => {
             if (res.event === "success") {
-                // إذا لم يكن مسجل دخول، يرفع باسم "زائر"
-                const userMail = auth.currentUser ? auth.currentUser.email : "guest@xraws.com";
                 db.ref('posts').push({ 
                     url: res.info.secure_url, 
-                    user: userMail, 
-                    time: Date.now() 
+                    user: auth.currentUser ? auth.currentUser.email : "Zair_XRAWS", 
+                    likes: 0, time: Date.now() 
                 });
             }
         });
 
-        // جعل زر الرفع يعمل للعام والأعضاء
-        function openUploadWidget() {
-            widget.open();
-        }
+        // الأزرار الحقيقية
+        function doLike(id, current) { db.ref('posts/'+id).update({ likes: (current || 0) + 1 }); }
+        function openComments() { document.getElementById('comment-box').style.bottom = '0'; }
+        function closeComments() { document.getElementById('comment-box').style.bottom = '-100%'; }
+        function doShare(url) { navigator.clipboard.writeText(url); alert("تم نسخ رابط الفيديو! 🔗"); }
 
         db.ref('posts').on('value', snap => {
             const feed = document.getElementById('video-feed');
             feed.innerHTML = '';
             snap.forEach(child => {
                 const p = child.val();
-                const isMe = auth.currentUser && auth.currentUser.email === ADMIN_MAIL;
+                const id = child.key;
+                const isMe = auth.currentUser && auth.currentUser.email === ADMIN;
+                
                 feed.innerHTML += `
                     <div class="video-item">
                         <video src="${p.url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
                         
                         <div class="side-bar">
-                            <div class="action-unit"><i class="fas fa-heart text-[#d8b4fe]"></i><span>11.3K</span></div>
-                            <div class="action-unit"><i class="fas fa-comment-dots"></i><span>6</span></div>
-                            <div class="action-unit"><i class="fas fa-share"></i><span>نشر</span></div>
-                            ${isMe ? `<div class="action-unit text-red-400" onclick="deletePost('${child.key}')"><i class="fas fa-trash-alt"></i></div>` : ''}
+                            <div class="glass-btn" onclick="doLike('${id}', ${p.likes})">
+                                <i class="fas fa-heart text-red-500"></i>
+                                <span>${p.likes || 0}</span>
+                            </div>
+                            <div class="glass-btn" onclick="openComments()">
+                                <i class="fas fa-comment-dots"></i>
+                                <span>12</span>
+                            </div>
+                            <div class="glass-btn" onclick="doShare('${p.url}')">
+                                <i class="fas fa-share"></i>
+                                <span>نشر</span>
+                            </div>
+                            ${isMe ? `<div class="glass-btn border-red-500" onclick="db.ref('posts/${id}').remove()"><i class="fas fa-trash text-red-500"></i></div>` : ''}
                         </div>
 
-                        <div class="video-footer">
-                            <span class="user-tag">@${p.user.split('@')[0]} ${p.user === ADMIN_MAIL ? '⭐' : ''}</span>
-                            <p class="description">محتوى حصري على منصة XRAWS الأرجوانية 💜✨</p>
+                        <div class="video-info">
+                            <span class="user-tag">@${p.user.split('@')[0]} ${p.user === ADMIN ? '⭐' : ''}</span>
+                            <p class="text-sm mt-1 opacity-80">مرحباً بك في عالم XRAWS الزجاجي الأحمر 🔥🍒</p>
                         </div>
                     </div>`;
             });
         });
-
-        function deletePost(id) { if(confirm("حذف الفيديو نهائياً؟")) db.ref('posts').child(id).remove(); }
     </script>
 </body>
 </html>

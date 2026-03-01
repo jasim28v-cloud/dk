@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XRAWS PRESTIGE | عبدالله جاسم</title>
+    <title>XRAWS | ULTIMATE EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,108 +11,120 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Cairo:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@500;700&display=swap');
         
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #3d0000; font-family: 'Cairo', sans-serif; }
-        .feed { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .feed::-webkit-scrollbar { display: none; }
-        .video-item { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Rajdhani', sans-serif; color: white; }
+        
+        .cyber-header {
+            position: fixed; top: 0; width: 100%; z-index: 2000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 25px; background: linear-gradient(to bottom, rgba(255,0,0,0.2), transparent);
+            backdrop-filter: blur(5px);
+        }
+
+        .logo { font-family: 'Orbitron'; font-weight: 900; font-size: 28px; color: #ff0000; text-shadow: 0 0 20px #ff0000; letter-spacing: 3px; }
+
+        .join-btn {
+            background: linear-gradient(90deg, #ff0000, #4a0000);
+            padding: 10px 25px; border-radius: 5px; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px; border: 1px solid #ff4d4d;
+            box-shadow: 0 0 15px #ff0000; transition: 0.3s;
+        }
+
+        .join-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px #ff0000; }
+
+        .feed-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .feed-container::-webkit-scrollbar { display: none; }
+
+        .post-card { height: 100vh; width: 100%; scroll-snap-align: start; position: relative; background: #050000; }
         video { height: 100%; width: 100%; object-fit: cover; }
 
-        /* الساعة الرقمية واسم الموقع */
-        .top-header {
-            position: fixed; top: 0; width: 100%; z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
-        }
-        .site-name { font-family: 'Orbitron'; font-size: 24px; color: #ff0000; text-shadow: 0 0 15px #ff0000; font-weight: 900; }
-        #digital-clock { font-family: 'Orbitron'; color: white; font-size: 18px; letter-spacing: 2px; }
-
-        /* الأزرار الجانبية الزجاجية */
-        .side-bar { position: absolute; right: 15px; bottom: 140px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .glass-btn {
-            background: rgba(255, 0, 0, 0.2); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2); width: 60px; height: 60px;
-            border-radius: 50%; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; color: white; cursor: pointer; transition: 0.3s;
-        }
-        .glass-btn i { font-size: 24px; }
-        .glass-btn span { font-size: 11px; font-weight: bold; margin-top: 2px; }
-
-        /* معلومات الفيديو */
-        .video-info {
-            position: absolute; left: 15px; bottom: 100px; right: 85px;
-            background: rgba(255, 0, 0, 0.1); backdrop-filter: blur(10px);
-            padding: 15px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white; z-index: 100;
+        .side-interface {
+            position: absolute; right: 20px; bottom: 120px;
+            display: flex; flex-direction: column; gap: 20px; z-index: 100;
         }
 
-        /* نافذة التعليقات الحقيقية */
-        .comments-tray {
-            position: fixed; bottom: -100%; left: 0; width: 100%; height: 60%;
-            background: rgba(30, 0, 0, 0.98); backdrop-filter: blur(25px);
-            border-radius: 30px 30px 0 0; z-index: 2000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 20px; color: white; display: flex; flex-direction: column;
-        }
-        .comment-list { flex: 1; overflow-y: auto; margin-bottom: 20px; }
-        .comment-input-area { display: flex; gap: 10px; border-top: 1px solid #444; padding-top: 15px; }
-        .comment-input-area input { flex: 1; background: #222; border: 1px solid #ff0000; border-radius: 10px; padding: 10px; color: white; }
-
-        /* شريط الحقوق السفلي */
-        .footer-rights {
-            position: fixed; bottom: 75px; left: 0; width: 100%;
-            text-align: center; color: rgba(255,255,255,0.4); font-size: 10px; z-index: 100;
+        .control-unit {
+            background: rgba(255, 0, 0, 0.1); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 0, 0, 0.3); width: 60px; height: 60px;
+            border-radius: 12px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; transition: 0.3s;
         }
 
-        /* القلوب عند النقر */
-        .heart-pop {
-            position: absolute; pointer-events: none; color: #ff0000;
-            font-size: 50px; animation: heartBeat 0.8s ease-out forwards; z-index: 500;
-        }
-        @keyframes heartBeat {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.5); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; margin-top: -100px; }
+        .control-unit i { font-size: 22px; color: #ff0000; }
+        .control-unit span { font-size: 10px; margin-top: 4px; font-weight: bold; font-family: 'Orbitron'; }
+
+        .video-meta {
+            position: absolute; left: 20px; bottom: 100px; right: 100px;
+            background: rgba(0,0,0,0.5); border-left: 4px solid #ff0000;
+            padding: 15px; border-radius: 0 15px 15px 0; z-index: 100;
         }
 
-        .nav-bottom {
+        .clock-display { font-family: 'Orbitron'; font-size: 14px; color: #ff4d4d; opacity: 0.8; }
+
+        .bottom-bar {
             position: fixed; bottom: 0; width: 100%; height: 70px;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            border-top: 1px solid #ff000033; display: flex; justify-content: space-around; align-items: center; z-index: 500;
+            background: rgba(10, 0, 0, 0.9); border-top: 2px solid #ff0000;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+        }
+
+        .nav-link { color: #fff; font-size: 20px; opacity: 0.5; transition: 0.3s; }
+        .nav-link.active { opacity: 1; color: #ff0000; text-shadow: 0 0 10px #ff0000; }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 3000; display: none; align-items: center; justify-content: center;
+        }
+
+        .auth-card {
+            background: #111; border: 2px solid #ff0000; padding: 40px;
+            border-radius: 20px; width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 0 50px rgba(255,0,0,0.2);
+        }
+
+        input {
+            width: 100%; background: #222; border: 1px solid #444; padding: 15px;
+            border-radius: 10px; margin-bottom: 15px; color: white; outline: none;
+        }
+
+        input:focus { border-color: #ff0000; }
+
+        .footer-credit {
+            position: absolute; bottom: 85px; width: 100%; text-align: center;
+            font-size: 9px; letter-spacing: 2px; opacity: 0.3; text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
-    <div class="top-header">
-        <div class="site-name">XRAWS</div>
-        <div id="digital-clock">00:00:00</div>
-    </div>
+    <header class="cyber-header">
+        <div class="logo">XRAWS</div>
+        <div id="clock" class="clock-display">00:00:00</div>
+        <button class="join-btn" id="main-join" onclick="toggleAuth()">Join Now</button>
+    </header>
 
-    <div class="feed" id="video-feed"></div>
+    <div class="feed-container" id="main-feed"></div>
 
-    <div class="footer-rights">تم إنتاج كل شيء بواسطة XRAWS Community © 2024</div>
+    <div class="footer-credit">Developed by XRAWS Community Elite © 2026</div>
 
-    <div class="nav-bottom">
-        <div class="text-white text-xl"><i class="fas fa-home"></i></div>
-        <div class="bg-red-600 w-12 h-10 rounded-xl flex items-center justify-center text-white" onclick="widget.open()"><i class="fas fa-plus"></i></div>
-        <div class="text-white text-xl" onclick="toggleComments()"><i class="fas fa-comment"></i></div>
-    </div>
+    <nav class="bottom-bar">
+        <div class="nav-link active"><i class="fas fa-th-large"></i></div>
+        <div class="nav-link" onclick="handleUpload()"><i class="fas fa-plus-square" style="font-size: 30px;"></i></div>
+        <div class="nav-link" onclick="toggleAuth()"><i class="fas fa-user-astronaut"></i></div>
+    </nav>
 
-    <div id="comment-tray" class="comments-tray">
-        <div class="flex justify-between items-center mb-4">
-            <span class="font-bold">التعليقات الحقيقية</span>
-            <i class="fas fa-times text-2xl" onclick="toggleComments()"></i>
-        </div>
-        <div id="comment-list" class="comment-list"></div>
-        <div class="comment-input-area">
-            <input type="text" id="comment-input" placeholder="اكتب تعليقك هنا...">
-            <button onclick="postComment()" class="bg-red-600 px-4 py-2 rounded-xl">نشر</button>
+    <div class="modal-overlay" id="auth-modal">
+        <div class="auth-card">
+            <h2 style="font-family:'Orbitron'" class="text-2xl mb-6 text-red-600 uppercase">System Access</h2>
+            <input type="email" id="email" placeholder="NEURAL EMAIL">
+            <input type="password" id="pass" placeholder="SECURITY KEY">
+            <button onclick="processAuth()" class="w-full bg-red-600 py-3 rounded-lg font-bold uppercase tracking-widest">Connect</button>
+            <button onclick="toggleAuth()" class="mt-4 text-xs opacity-50">ABORT MISSION</button>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = {
+        const config = {
             apiKey: "AIzaSyD93aEghXrgkTYRKnQ98rVe1Fu9NdngcxY",
             authDomain: "soko-7d03e.firebaseapp.com",
             databaseURL: "https://soko-7d03e-default-rtdb.firebaseio.com",
@@ -122,82 +134,87 @@
             appId: "1:636395398521:web:fbd094bd35a2883fda3ba8"
         };
 
-        const ADMIN = "jasim300v@gmail.com";
-        firebase.initializeApp(firebaseConfig);
+        const ADMIN_ID = "jasim300v@gmail.com";
+        firebase.initializeApp(config);
         const db = firebase.database();
         const auth = firebase.auth();
-        let currentPostId = "";
 
-        // الساعة الرقمية
         setInterval(() => {
             const now = new Date();
-            document.getElementById('digital-clock').innerText = now.toLocaleTimeString('en-GB');
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-US', { hour12: false });
         }, 1000);
 
-        // قلوب عند النقر على الفيديو
-        function spawnHeart(e) {
-            const heart = document.createElement('i');
-            heart.className = 'fas fa-heart heart-pop';
-            heart.style.left = (e.clientX - 25) + 'px';
-            heart.style.top = (e.clientY - 25) + 'px';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 800);
+        function toggleAuth() {
+            const m = document.getElementById('auth-modal');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        const widget = cloudinary.createUploadWidget({cloudName: "dfscughol", uploadPreset: "update_vk"}, (err, res) => {
+        async function processAuth() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('pass').value;
+            try {
+                await auth.signInWithEmailAndPassword(e, p);
+            } catch {
+                await auth.createUserWithEmailAndPassword(e, p);
+            }
+            toggleAuth();
+        }
+
+        const uploader = cloudinary.createUploadWidget({
+            cloudName: "dfscughol", uploadPreset: "update_vk"
+        }, (err, res) => {
             if (res.event === "success") {
-                db.ref('posts').push({ url: res.info.secure_url, user: auth.currentUser ? auth.currentUser.email : "guest", likes: 0 });
+                db.ref('posts').push({
+                    url: res.info.secure_url,
+                    user: auth.currentUser ? auth.currentUser.email : "GUEST_USER",
+                    likes: Math.floor(Math.random() * 100),
+                    timestamp: Date.now()
+                });
             }
         });
 
-        function toggleComments(id) {
-            const tray = document.getElementById('comment-tray');
-            if(id) {
-                currentPostId = id;
-                loadComments(id);
-                tray.style.bottom = '0';
-            } else {
-                tray.style.bottom = '-100%';
+        function handleUpload() { uploader.open(); }
+
+        auth.onAuthStateChanged(user => {
+            const btn = document.getElementById('main-join');
+            if(user) {
+                btn.innerText = (user.email === ADMIN_ID) ? "ADMIN" : user.email.split('@')[0].toUpperCase();
+                btn.style.background = "linear-gradient(90deg, #00ff00, #004a00)";
+                btn.style.boxShadow = "0 0 15px #00ff00";
             }
-        }
-
-        function loadComments(postId) {
-            db.ref('comments/' + postId).on('value', snap => {
-                const list = document.getElementById('comment-list');
-                list.innerHTML = '';
-                snap.forEach(child => {
-                    const c = child.val();
-                    list.innerHTML += `<div class="mb-3 p-3 bg-white/5 rounded-xl"><span class="text-red-400 font-bold block text-xs">@${c.user}</span><p class="text-sm">${c.text}</p></div>`;
-                });
-            });
-        }
-
-        function postComment() {
-            const txt = document.getElementById('comment-input').value;
-            if(!txt) return;
-            db.ref('comments/' + currentPostId).push({ text: txt, user: auth.currentUser ? auth.currentUser.email.split('@')[0] : 'عضو' });
-            document.getElementById('comment-input').value = '';
-        }
+        });
 
         db.ref('posts').on('value', snap => {
-            const feed = document.getElementById('video-feed');
-            feed.innerHTML = '';
+            const container = document.getElementById('main-feed');
+            container.innerHTML = '';
             snap.forEach(child => {
-                const p = child.val();
+                const data = child.val();
                 const id = child.key;
-                const isMe = auth.currentUser && auth.currentUser.email === ADMIN;
-                feed.innerHTML += `
-                    <div class="video-item" onclick="spawnHeart(event)">
-                        <video src="${p.url}" loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
-                        <div class="side-bar">
-                            <div class="glass-btn" onclick="db.ref('posts/${id}').update({likes: (p.likes||0)+1})"><i class="fas fa-heart text-red-500"></i><span>${p.likes||0}</span></div>
-                            <div class="glass-btn" onclick="toggleComments('${id}')"><i class="fas fa-comment-dots"></i><span>التعليقات</span></div>
-                            <div class="glass-btn" onclick="navigator.clipboard.writeText('${p.url}');alert('نسخ الرابط!')"><i class="fas fa-share"></i><span>نشر</span></div>
-                            ${isMe ? `<div class="glass-btn bg-red-900/50" onclick="db.ref('posts/${id}').remove()"><i class="fas fa-trash"></i></div>` : ''}
+                const isAdmin = auth.currentUser && auth.currentUser.email === ADMIN_ID;
+
+                container.innerHTML += `
+                    <div class="post-card">
+                        <video src="${data.url}" loop playsinline onclick="this.paused?this.play():this.pause()"></video>
+                        <div class="side-interface">
+                            <div class="control-unit" onclick="db.ref('posts/${id}').update({likes: (data.likes||0)+1})">
+                                <i class="fas fa-heart"></i>
+                                <span>${data.likes||0}</span>
+                            </div>
+                            <div class="control-unit" onclick="alert('Comments loading...')">
+                                <i class="fas fa-comment-dots"></i>
+                                <span>99</span>
+                            </div>
+                            <div class="control-unit" onclick="navigator.clipboard.writeText('${data.url}');alert('Link Encrypted & Copied!')">
+                                <i class="fas fa-share-alt"></i>
+                                <span>SHARE</span>
+                            </div>
+                            ${isAdmin ? `<div class="control-unit" style="border-color:white" onclick="db.ref('posts/${id}').remove()">
+                                <i class="fas fa-trash-alt" style="color:white"></i>
+                            </div>` : ''}
                         </div>
-                        <div class="video-info">
-                            <div class="font-black text-red-500 mb-1">@${p.user.split('@')[0]} ${p.user===ADMIN?'⭐':''}</div>
-                            <div class="text-xs opacity-80">تم الإنتاج بواسطة مجتمع XRAWS الحصري</div>
+                        <div class="video-meta">
+                            <div class="user-tag" style="color:#ff0000; font-weight:bold; font-family:'Orbitron'">@${data.user.split('@')[0]}</div>
+                            <div class="text-xs opacity-60 uppercase mt-1">Status: Active // Data Stream: Stable</div>
                         </div>
                     </div>`;
             });

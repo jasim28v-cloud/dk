@@ -3,187 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RΞD_VØID | ULTRA NEXUS</title>
+    <title>RΞD_VØID | FULL CONTROL</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Cairo:wght@300;700&display=swap');
-        
-        :root { --neon: #ff0000; --bg: #000000; }
-
-        body { 
-            background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; 
-            margin: 0; overflow: hidden; perspective: 1000px;
-        }
-
-        /* خلفية البلازما المتحركة */
-        .plasma-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), #200 0%, #000 50%);
-            z-index: -1; transition: 0.1s;
-        }
-
-        .scroll-container { 
-            height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; 
-            scrollbar-width: none;
-        }
-
-        .video-card {
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-            scroll-snap-align: start; position: relative; padding: 15px;
-        }
-
-        /* إطار الفيديو المتطور */
-        .video-frame {
-            width: 100%; height: 85vh; border-radius: 40px; overflow: hidden;
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.2), inset 0 0 20px rgba(0,0,0,1);
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            position: relative; transform: translateZ(20px);
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
+        :root { --neon: #ff0000; --glass: rgba(15, 0, 0, 0.85); --bg: #020000; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; }
+        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .scroll-engine::-webkit-scrollbar { display: none; }
+        .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* الأزرار النانوية البارزة */
-        .side-dock {
-            position: absolute; left: 30px; bottom: 120px;
-            display: flex; flex-direction: column; gap: 25px;
+        .glass-ui { background: var(--glass); backdrop-filter: blur(30px); border: 1px solid rgba(255, 0, 0, 0.15); }
+        .side-controls { position: absolute; left: 18px; bottom: 140px; display: flex; flex-direction: column; gap: 20px; z-index: 100; }
+        .btn-action { width: 55px; height: 55px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        
+        /* زر الحذف الأسطوري للمشرف */
+        .admin-delete-btn {
+            position: absolute; top: 25px; left: 25px; 
+            background: rgba(255, 0, 0, 0.8); width: 45px; height: 45px;
+            border-radius: 12px; display: none; align-items: center; justify-content: center;
+            z-index: 500; cursor: pointer; box-shadow: 0 0 20px #ff0000;
         }
 
-        .nano-node {
-            width: 60px; height: 60px; background: rgba(15,0,0,0.9);
-            border-radius: 20px; border: 1px solid rgba(255,0,0,0.5);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.5), -2px -2px 10px rgba(255,0,0,0.1);
-            transition: 0.3s; cursor: pointer;
-        }
-
-        .nano-node:active { transform: scale(0.9) translateZ(-10px); box-shadow: 0 0 20px var(--neon); }
-
-        /* شريط التحكم السفلي "العائم" */
-        .dock-bar {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 400px; height: 75px;
-            background: rgba(20, 0, 0, 0.8); backdrop-filter: blur(20px);
-            border-radius: 30px; border: 1px solid rgba(255, 0, 0, 0.2);
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
-        }
-
-        #upload-trigger {
-            width: 65px; height: 65px; background: var(--neon);
-            border-radius: 22px; transform: translateY(-20px);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 30px rgba(255,0,0,0.5);
-        }
-
-        .admin-trash {
-            position: absolute; top: 40px; left: 40px; background: red;
-            width: 45px; height: 45px; border-radius: 12px; display: none;
-            align-items: center; justify-content: center; z-index: 500;
-        }
+        #toast { position: fixed; top: 50px; left: 50%; transform: translateX(-50%); background: #ff0000; padding: 10px 20px; border-radius: 10px; z-index: 2000; display: none; font-family: 'Orbitron'; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="plasma-bg" id="bg"></div>
+    <div id="toast">SYSTEM_MSG</div>
 
-    <header class="fixed top-10 left-10 z-[500] pointer-events-none">
-        <h1 class="text-5xl font-black font-[Orbitron] text-red-600 tracking-tighter opacity-80">RΞD</h1>
-        <div class="h-1 w-20 bg-red-600 mt-2"></div>
+    <header class="fixed top-0 w-full z-[250] p-6 flex justify-between items-center bg-gradient-to-b from-black to-transparent pointer-events-none">
+        <div class="pointer-events-auto">
+            <h1 class="text-3xl font-black font-[Orbitron] text-red-600 tracking-tighter" style="text-shadow: 0 0 10px #ff0000;">RΞD_VØID</h1>
+            <span id="status-tag" class="text-[8px] text-white/40 font-[Orbitron] tracking-widest">STATION_V4_READY</span>
+        </div>
     </header>
 
-    <div class="scroll-container" id="main-stack">
-        </div>
+    <main class="scroll-engine" id="video-stack">
+        <div class="h-full flex flex-col items-center justify-center text-red-600 font-[Orbitron]">INIT_VOX_STREAMS...</div>
+    </main>
 
-    <nav class="dock-bar">
-        <div class="text-white/40 hover:text-red-600" onclick="location.reload()"><i class="fas fa-grid-2 text-2xl"></i></div>
-        <div id="upload-trigger" onclick="openUploader()"><i class="fas fa-plus text-2xl text-white"></i></div>
-        <div class="text-white/40 hover:text-red-600" onclick="toggleChat()"><i class="fas fa-ghost text-2xl"></i></div>
+    <nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-[440px] h-20 glass-ui rounded-[2.5rem] flex justify-around items-center z-[300]">
+        <i class="fas fa-home opacity-40 hover:opacity-100 text-xl cursor-pointer" onclick="location.reload()"></i>
+        <i class="fas fa-comment-dots opacity-40 hover:opacity-100 text-xl cursor-pointer" onclick="toggleChat()"></i>
+        <div id="upload-trigger" class="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center transform -translate-y-4 shadow-xl cursor-pointer"><i class="fas fa-plus text-2xl"></i></div>
+        <i class="fas fa-share-alt opacity-40 hover:opacity-100 text-xl cursor-pointer" onclick="shareVideo()"></i>
+        <i class="fas fa-fingerprint opacity-40 hover:opacity-100 text-xl cursor-pointer" onclick="adminLockCheck()"></i>
     </nav>
 
-    <div onclick="requestAdmin()" style="position:fixed; top:0; right:0; width:80px; height:80px; z-index:2000; cursor:pointer;"></div>
+    <div id="chat-overlay" class="fixed inset-0 z-[1000] hidden flex-col bg-black/98 backdrop-blur-3xl">
+        <div class="p-8 border-b border-red-950 flex justify-between items-center">
+            <h2 class="text-red-600 font-[Orbitron] tracking-widest text-lg">NEXUS_CHAT</h2>
+            <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleChat()"></i>
+        </div>
+        <div id="chat-box" class="flex-1 p-6 overflow-y-auto space-y-4"></div>
+        <div class="p-6 flex gap-3"><input type="text" id="msg-input" class="flex-1 bg-white/5 border border-red-900/30 rounded-xl p-4 text-white" placeholder="Message..."><button onclick="sendChat()" class="bg-red-600 px-6 rounded-xl">SEND</button></div>
+    </div>
 
     <script>
-        // التفاعل مع الخلفية
-        document.addEventListener('mousemove', e => {
-            const bg = document.getElementById('bg');
-            bg.style.setProperty('--x', (e.clientX / window.innerWidth * 100) + '%');
-            bg.style.setProperty('--y', (e.clientY / window.innerHeight * 100) + '%');
-        });
-
-        // إعدادات التقنية
         const firebaseConfig = { databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const UID = localStorage.getItem('v_uid') || 'ID_' + Math.random().toString(36).substr(2, 4).toUpperCase();
+        const UID = localStorage.getItem('v_uid') || 'U_' + Math.floor(Math.random()*9999);
         localStorage.setItem('v_uid', UID);
 
-        let isOverlord = false;
+        let isAdmin = false;
+        let tapCount = 0;
 
-        // جلب الفيديوهات بتصميم الـ Cards
-        function fetchVideos() {
-            db.ref('vox_god').on('value', s => {
-                const stack = document.getElementById('main-stack');
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
+
+        // نظام المشرف لتفعيل الحذف
+        function adminLockCheck() {
+            tapCount++;
+            if(tapCount >= 5) {
+                if(prompt("ENTER OVERLORD CODE:") === "vox77") {
+                    isAdmin = true;
+                    document.getElementById('status-tag').innerText = "OVERLORD_ACTIVE";
+                    document.getElementById('status-tag').style.color = "#00ff00";
+                    showToast("ADMIN_MODE_ENABLED");
+                    renderVideos();
+                }
+                tapCount = 0;
+            } else { showToast(`TAPS: ${tapCount}/5`); }
+        }
+
+        function renderVideos() {
+            db.ref('vox_god').on('value', (s) => {
+                const stack = document.getElementById('video-stack');
                 const data = s.val();
                 if(!data) return;
                 stack.innerHTML = '';
                 Object.keys(data).reverse().forEach(id => {
                     const v = data[id];
-                    const card = document.createElement('div');
-                    card.className = 'video-card';
-                    card.innerHTML = `
-                        <div class="video-frame">
-                            <video loop playsinline src="${v.url}"></video>
-                            ${isOverlord ? `<div class="admin-trash" style="display:flex" onclick="deleteVideo('${id}')"><i class="fas fa-trash"></i></div>` : ''}
-                        </div>
-                        <div class="side-dock">
-                            <div class="nano-node" onclick="likeVideo('${id}')">
-                                <i class="fas fa-heart ${v.likedBy && v.likedBy[UID] ? 'text-red-600' : ''}"></i>
-                                <span class="text-[10px] font-bold mt-1">${v.likes || 0}</span>
+                    const sec = document.createElement('section');
+                    sec.className = 'video-segment';
+                    sec.innerHTML = `
+                        <video loop playsinline src="${v.url}"></video>
+                        ${isAdmin ? `<div class="admin-delete-btn" style="display:flex" onclick="deleteNode('${id}')"><i class="fas fa-trash"></i></div>` : ''}
+                        <div class="side-controls">
+                            <div class="btn-action glass-ui ${v.likedBy && v.likedBy[UID] ? 'text-red-600' : ''}" onclick="likeNode('${id}')">
+                                <i class="fas fa-heart"></i><span class="text-[10px] mt-1">${v.likes || 0}</span>
                             </div>
-                            <div class="nano-node" onclick="toggleChat()"><i class="fas fa-comment-alt"></i></div>
-                            <div class="nano-node" onclick="shareVideo()"><i class="fas fa-radiation"></i></div>
+                            <div class="btn-action glass-ui" onclick="toggleChat()"><i class="fas fa-comment"></i></div>
                         </div>
                     `;
-                    stack.appendChild(card);
+                    stack.appendChild(sec);
                 });
-                observeVideos();
+                initObserver();
             });
         }
 
-        // الرفع
-        function openUploader() {
-            cloudinary.openUploadWidget({
-                cloudName: "dqzjfaqg4", uploadPreset: "vox_god", resourceType: "video"
-            }, (err, res) => {
-                if (!err && res.event === "success") {
-                    db.ref('vox_god').push({ url: res.info.secure_url, likes: 0, sender: UID });
-                }
-            });
-        }
+        function deleteNode(id) { if(confirm("حذف الفيديو نهائياً؟")) db.ref(`vox_god/${id}`).remove(); }
 
-        // الإدارة
-        let taps = 0;
-        function requestAdmin() {
-            taps++;
-            if(taps >= 5) {
-                if(prompt("PASSWORD:") === "vox77") {
-                    isOverlord = true;
-                    alert("ACCESS GRANTED");
-                    fetchVideos();
-                }
-                taps = 0;
+        const widget = cloudinary.createUploadWidget({
+            cloudName: "dqzjfaqg4", uploadPreset: "vox_god", resourceType: "video"
+        }, (err, res) => {
+            if (!err && res.event === "success") {
+                db.ref('vox_god').push({ url: res.info.secure_url, sender: UID, likes: 0 });
             }
-        }
+        });
+        document.getElementById("upload-trigger").onclick = () => widget.open();
 
-        function deleteVideo(id) { if(confirm("حذف؟")) db.ref(`vox_god/${id}`).remove(); }
-        function shareVideo() { navigator.share({url: location.href}); }
-        function toggleChat() { alert("نظام المحادثة النانوية قيد الربط..."); }
-
-        function likeVideo(id) {
-            window.open("https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec", "_blank");
+        function likeNode(id) {
+            window.open("https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec", '_blank');
             db.ref(`vox_god/${id}`).transaction(p => {
                 if(p) {
                     if(!p.likedBy) p.likedBy = {};
@@ -193,19 +139,44 @@
             });
         }
 
-        function observeVideos() {
+        function toggleChat() { 
+            const c = document.getElementById('chat-overlay');
+            if(c.classList.contains('hidden')) window.open("https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d", '_blank');
+            c.classList.toggle('hidden'); c.classList.toggle('flex');
+        }
+
+        function shareVideo() { navigator.share({url: location.href}); }
+
+        function sendChat() {
+            const i = document.getElementById('msg-input');
+            if(i.value.trim()){ db.ref('global_chat').push({user:UID, text:i.value}); i.value=''; }
+        }
+
+        db.ref('global_chat').limitToLast(10).on('value', s => {
+            const b = document.getElementById('chat-box'); b.innerHTML = '';
+            s.forEach(c => {
+                const m = c.val();
+                const d = document.createElement('div');
+                d.className = m.user === UID ? 'text-left' : 'text-right';
+                d.innerHTML = `<p class="inline-block p-3 bg-white/5 rounded-lg text-sm border border-red-900/20">${m.text}</p>`;
+                b.appendChild(d);
+            });
+            b.scrollTop = b.scrollHeight;
+        });
+
+        function initObserver() {
             const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
                     if(e.isIntersecting && v) v.play().catch(()=>{});
                     else if(v) v.pause();
                 });
-            }, { threshold: 0.8 });
-            document.querySelectorAll('.video-card').forEach(c => obs.observe(c));
+            }, { threshold: 0.6 });
+            document.querySelectorAll('.video-segment').forEach(s => obs.observe(s));
         }
 
         document.addEventListener('click', () => { document.querySelectorAll('video').forEach(v => v.muted = false); }, { once: true });
-        fetchVideos();
+        renderVideos();
     </script>
 </body>
 </html>

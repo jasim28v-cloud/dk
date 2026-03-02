@@ -16,65 +16,47 @@
         body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; overflow-x: hidden; min-height: 100vh; }
 
         .hero-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, #0a0f1a 0%, #000 100%); }
-        .hero-bg::after { content: ''; position: absolute; inset: 0; background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); opacity: 0.1; }
+        
+        .titan-grid { display: grid; grid-template-columns: 100px 320px 1fr 320px; height: 100vh; gap: 0; }
 
-        /* تعديل الهيكل ليكون مرناً */
-        .titan-grid { 
-            display: grid; 
-            grid-template-columns: 100px 320px 1fr 320px; 
-            height: 100vh; 
-            gap: 0; 
-        }
-
-        /* تحويل التصميم للهواتف */
         @media (max-width: 1200px) {
-            .titan-grid { 
-                grid-template-columns: 1fr; 
-                height: auto; 
-                display: flex; 
-                flex-direction: column; 
-            }
-            body { overflow-y: auto; }
-            .glass-sidebar { 
-                flex-direction: row !important; 
-                width: 100%; 
-                height: 70px !important; 
-                padding: 0 20px !important; 
-                justify-content: space-between !important; 
-                position: sticky; 
-                top: 0; 
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
+            .titan-grid { grid-template-columns: 1fr; height: auto; display: flex; flex-direction: column; }
+            .glass-sidebar { flex-direction: row !important; width: 100%; height: 70px !important; padding: 0 20px !important; justify-content: space-between !important; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); }
             .logo-vertical { writing-mode: horizontal-tb !important; margin-bottom: 0 !important; font-size: 16px !important; }
             .glass-sidebar .flex-col { flex-direction: row !important; gap: 15px !important; }
-            .btn-glow { width: 40px !important; height: 40px !important; border-radius: 12px !important; }
-            .glass-panel { order: 3; border: none !important; border-top: 1px solid rgba(255,255,255,0.05); }
-            .main-display { order: 2; padding: 20px !important; }
+            .btn-glow { width: 45px !important; height: 45px !important; }
+            .main-display { padding: 15px !important; }
         }
 
-        .glass-sidebar { background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(50px); border-left: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; padding: 40px 0; z-index: 50; }
-        .glass-panel { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(30px); border-right: 1px solid rgba(255,255,255,0.05); padding: 30px; display: flex; flex-direction: column; }
+        .glass-sidebar { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(50px); border-left: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; padding: 40px 0; }
+        .glass-panel { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(30px); border-right: 1px solid rgba(255,255,255,0.05); padding: 25px; display: flex; flex-direction: column; }
 
-        .main-display { padding: 40px; overflow-y: auto; scrollbar-width: none; background: linear-gradient(to bottom, transparent, rgba(0,243,255,0.02)); }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .main-display { padding: 40px; overflow-y: auto; scrollbar-width: none; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
 
-        .titan-card { position: relative; aspect-ratio: 16/10; background: #000; border-radius: 25px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: 0.7s cubic-bezier(0.2, 1, 0.2, 1); box-shadow: 0 15px 35px rgba(0,0,0,0.5); cursor: pointer; }
-        .titan-card:hover { transform: scale(1.03); border-color: var(--primary); }
+        /* Titan Card & Watermark */
+        .titan-card { position: relative; aspect-ratio: 9/16; background: #000; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .titan-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(0, 243, 255, 0.2); }
         
-        video { width: 100%; height: 100%; object-fit: cover; filter: grayscale(40%); transition: 0.5s; }
-        .titan-card:hover video { filter: grayscale(0%); transform: scale(1.05); }
-
-        .card-info { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; opacity: 1; }
-
-        .btn-glow { background: rgba(255,255,255,0.05); width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-glow:hover { background: var(--primary); color: #000; box-shadow: 0 0 25px var(--primary); }
+        .watermark { position: absolute; top: 15px; right: 15px; font-family: 'Orbitron'; font-size: 12px; font-weight: 900; color: rgba(255,255,255,0.3); pointer-events: none; z-index: 5; text-shadow: 0 0 5px #000; }
         
-        .upload-giant { background: linear-gradient(45deg, var(--primary), #0077ff); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.5s; box-shadow: 0 10px 30px rgba(0, 243, 255, 0.3); margin-top: 20px; }
+        video { width: 100%; height: 100%; object-fit: cover; }
 
-        .logo-vertical { font-family: 'Orbitron'; font-weight: 900; font-size: 20px; letter-spacing: 5px; writing-mode: vertical-rl; text-transform: uppercase; color: var(--primary); text-shadow: 0 0 20px var(--primary); }
+        .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 40%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
+
+        /* Interaction Bar */
+        .interaction-side { position: absolute; left: 15px; bottom: 80px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
+        .action-btn { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); width: 45px; height: 45px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .action-btn:hover { background: var(--primary); color: #000; }
+        .action-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; }
+
+        /* Comments Section */
+        .comment-box { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 10px; margin-top: 10px; max-height: 100px; overflow-y: auto; font-size: 11px; border: 1px solid rgba(255,255,255,0.05); }
+
+        .btn-glow { background: rgba(255,255,255,0.05); width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .upload-giant { background: linear-gradient(45deg, var(--primary), #0077ff); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 18px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.4s; box-shadow: 0 10px 20px rgba(0, 243, 255, 0.2); width: 100%; }
         
-        /* تحسين السكرول */
-        ::-webkit-scrollbar { width: 0px; }
+        .logo-vertical { font-family: 'Orbitron'; font-weight: 900; font-size: 20px; letter-spacing: 5px; writing-mode: vertical-rl; color: var(--primary); text-shadow: 0 0 15px var(--primary); }
     </style>
 </head>
 <body>
@@ -85,69 +67,69 @@
         <aside class="glass-sidebar">
             <div class="logo-vertical mb-20">SHΔDØW</div>
             <div class="flex flex-col gap-8">
-                <div class="btn-glow" onclick="openAd()"><i class="fas fa-home"></i></div>
-                <div class="btn-glow" onclick="openAd()"><i class="fas fa-compass"></i></div>
-                <div class="btn-glow" onclick="openAd()"><i class="fas fa-crown text-yellow-500"></i></div>
-                <div class="btn-glow" onclick="openAd()"><i class="fas fa-user-shield"></i></div>
+                <div class="btn-glow" title="Home"><i class="fas fa-home text-xl"></i></div>
+                <div class="btn-glow" title="Trending"><i class="fas fa-fire text-xl text-orange-500"></i></div>
+                <div class="btn-glow" title="VIP"><i class="fas fa-crown text-xl text-yellow-500"></i></div>
+                <div class="btn-glow" title="Safety"><i class="fas fa-shield-halved text-xl"></i></div>
             </div>
         </aside>
 
         <section class="glass-panel">
-            <div class="mb-10">
-                <h3 class="text-[10px] font-[Orbitron] opacity-40 mb-2">SYSTEM_STATUS</h3>
-                <div class="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/5">
+            <div class="mb-8">
+                <h3 class="text-[10px] font-[Orbitron] opacity-40 mb-3 tracking-widest">SYSTEM_LIVE</h3>
+                <div class="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
                     <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span class="text-xs font-bold">CORE_CONNECTED</span>
+                    <span class="text-[10px] font-bold tracking-tighter">CORE_TITAN_CONNECTED</span>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <h3 class="text-[10px] font-[Orbitron] opacity-40">COMMUNITY_FEED</h3>
-                <div id="mini-chat" class="space-y-4 h-[200px] lg:h-[300px] overflow-y-auto pr-2 opacity-60 text-xs">
-                    <div class="p-3 bg-white/5 rounded-xl border-r-2 border-cyan-500">مرحباً بك في نظام تيتان..</div>
+            <div class="space-y-6 flex-1">
+                <h3 class="text-[10px] font-[Orbitron] opacity-40 tracking-widest uppercase">Global Chat</h3>
+                <div id="mini-chat" class="space-y-4 h-[250px] overflow-y-auto pr-2 opacity-80 text-[11px]">
+                    </div>
+                <div class="flex gap-2">
+                    <input id="chat-input" type="text" placeholder="أرسل رسالة..." class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs outline-none focus:border-cyan-500">
+                    <button onclick="sendMessage()" class="bg-cyan-500 text-black px-4 rounded-xl text-xs font-bold">إرسال</button>
                 </div>
             </div>
 
-            <div class="mt-auto">
+            <div class="mt-8">
                 <div class="upload-giant" id="mega-upload">
-                    <i class="fas fa-cloud-arrow-up mr-2"></i> UPLOAD_DATA
+                    <i class="fas fa-plus-circle mr-2"></i> UPLOAD_TITAN
                 </div>
             </div>
         </section>
 
         <main class="main-display">
-            <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
+            <header class="flex justify-between items-center mb-10">
                 <div>
-                    <h1 class="text-3xl lg:text-4xl font-black italic tracking-tighter">EXPLORE <span class="text-cyan-400">TITAN</span></h1>
-                    <p class="text-[10px] opacity-40 font-[Orbitron]">TOTAL_ENCRYPTED_ARCHIVE_v9.2</p>
+                    <h1 class="text-4xl font-black italic tracking-tighter uppercase">Titan <span class="text-cyan-400">Stream</span></h1>
+                    <p class="text-[10px] opacity-40 font-[Orbitron]">GLOBAL_ENCRYPTED_FEED_2026</p>
                 </div>
-                <div class="px-4 py-2 bg-white/5 rounded-full border border-white/10 text-[10px] font-bold" id="user-id">ID: ----</div>
+                <div id="user-id" class="px-5 py-2 bg-white/5 rounded-full border border-white/10 text-[10px] font-bold tracking-widest">ID: ----</div>
             </header>
 
             <div class="video-grid" id="titan-grid">
-                <div class="col-span-full py-20 text-center">
-                    <i class="fas fa-atom fa-spin text-4xl text-cyan-500 opacity-20"></i>
                 </div>
-            </div>
         </main>
 
         <section class="glass-panel border-r-0 border-l border-white/5">
-            <h3 class="text-[10px] font-[Orbitron] opacity-40 mb-6">GLOBAL_RECORDS</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-                <div class="p-5 bg-gradient-to-br from-white/5 to-transparent rounded-3xl border border-white/5 hover:border-cyan-500/30 transition cursor-pointer" onclick="openAd()">
-                    <div class="text-[10px] opacity-50 mb-1">MOST_VIEWED_PROTOCOL</div>
-                    <div class="text-xl font-black text-cyan-400">#SHΔDØW_TOP</div>
+            <h3 class="text-[10px] font-[Orbitron] opacity-40 mb-6 uppercase">Leaderboard</h3>
+            <div class="space-y-4">
+                <div class="p-5 bg-white/5 rounded-3xl border border-white/5">
+                    <div class="text-[9px] opacity-50 mb-1">TOTAL_TRAFFIC</div>
+                    <div class="text-xl font-black text-cyan-400">4.8 TB/s</div>
                 </div>
-                <div class="p-5 bg-gradient-to-br from-white/5 to-transparent rounded-3xl border border-white/5">
-                    <div class="text-[10px] opacity-50 mb-1">NETWORK_TRAFFIC</div>
-                    <div class="text-xl font-black">99.9% UPTIME</div>
+                <div class="p-5 bg-white/5 rounded-3xl border border-white/5">
+                    <div class="text-[9px] opacity-50 mb-1">ACTIVE_CORES</div>
+                    <div class="text-xl font-black">12,840</div>
                 </div>
             </div>
         </section>
     </div>
 
     <script>
-        const SHADOW_ID = localStorage.getItem('shadow_uid') || 'TITAN_' + Math.random().toString(36).substr(2, 5).toUpperCase();
+        const SHADOW_ID = localStorage.getItem('shadow_uid') || 'U_' + Math.random().toString(36).substr(2, 5).toUpperCase();
         localStorage.setItem('shadow_uid', SHADOW_ID);
         document.getElementById('user-id').innerText = `ID: ${SHADOW_ID}`;
 
@@ -165,37 +147,63 @@
             adToggle = (adToggle + 1) % AD_LINKS.length;
         }
 
+        // Cloudinary Upload
         const CLOUD_NAME = "dssk5tabb", UPLOAD_PRESET = "bjebvo5p";
-        const myWidget = cloudinary.createUploadWidget({ cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET }, (err, res) => {
+        const myWidget = cloudinary.createUploadWidget({ 
+            cloudName: CLOUD_NAME, 
+            uploadPreset: UPLOAD_PRESET,
+            clientAllowedFormats: ["mp4", "mov", "webm"]
+        }, (err, res) => {
             if (!err && res.event === "success") {
-                db.ref('videos/').push({ url: res.info.secure_url, sender: SHADOW_ID, likes: 0, timestamp: Date.now() });
-                openAd();
+                db.ref('videos/').push({ 
+                    url: res.info.secure_url, 
+                    sender: SHADOW_ID, 
+                    likes: 0, 
+                    shares: 0,
+                    comments: [{user: "System", text: "تم رفع الفيديو بنجاح"}],
+                    timestamp: Date.now() 
+                });
             }
         });
-        document.getElementById("mega-upload").onclick = () => { openAd(); myWidget.open(); };
+        document.getElementById("mega-upload").onclick = () => { myWidget.open(); };
 
+        // Real-time Video Feed
         db.ref('videos').on('value', (snapshot) => {
             const grid = document.getElementById('titan-grid');
             const data = snapshot.val();
-            if(!data) return;
             grid.innerHTML = '';
+            if(!data) return;
+
             Object.keys(data).reverse().forEach(id => {
                 const vid = data[id];
                 const card = document.createElement('div');
                 card.className = 'titan-card';
-                card.onclick = openAd;
                 card.innerHTML = `
-                    <video loop muted playsinline onmouseover="this.play()" onmouseout="this.pause()" src="${vid.url}"></video>
-                    <div class="card-info">
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <div class="text-[8px] font-[Orbitron] text-cyan-400">ENCRYPTED_USER</div>
-                                <div class="font-black text-sm">@${vid.sender}</div>
-                            </div>
-                            <div class="flex flex-col items-center gap-1" onclick="event.stopPropagation(); toggleLike('${id}')">
-                                <i class="fas fa-heart text-xl text-red-500"></i>
-                                <span class="text-[10px] font-bold">${vid.likes || 0}</span>
-                            </div>
+                    <div class="watermark">SHΔDØW TITAN</div>
+                    <video loop muted playsinline src="${vid.url}" onclick="togglePlay(this)"></video>
+                    
+                    <div class="interaction-side">
+                        <div class="action-btn" onclick="likeVideo('${id}')">
+                            <i class="fas fa-heart"></i>
+                            <span>${vid.likes || 0}</span>
+                        </div>
+                        <div class="action-btn" onclick="shareVideo('${id}')">
+                            <i class="fas fa-share"></i>
+                            <span>${vid.shares || 0}</span>
+                        </div>
+                        <div class="action-btn" onclick="focusComment('${id}')">
+                            <i class="fas fa-comment"></i>
+                            <span>${vid.comments ? Object.keys(vid.comments).length : 0}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-overlay">
+                        <div class="text-xs font-bold text-cyan-400 mb-1">@${vid.sender}</div>
+                        <div class="comment-box" id="comments-${id}">
+                            ${vid.comments ? Object.values(vid.comments).map(c => `<div><b class="text-cyan-400">${c.user}:</b> ${c.text}</div>`).join('') : 'لا يوجد تعليقات'}
+                        </div>
+                        <div class="flex mt-2 gap-2">
+                            <input type="text" placeholder="اكتب تعليقاً..." class="bg-black/50 text-[10px] w-full p-2 rounded-lg border border-white/10 outline-none focus:border-cyan-500" onkeydown="addComment(event, '${id}')">
                         </div>
                     </div>
                 `;
@@ -203,19 +211,53 @@
             });
         });
 
-        function toggleLike(id) {
+        // Functions
+        function togglePlay(v) { v.paused ? v.play() : v.pause(); }
+
+        function likeVideo(id) {
             openAd();
             db.ref(`videos/${id}`).transaction(p => { if(p) p.likes = (p.likes || 0) + 1; return p; });
         }
 
-        db.ref('global_chat').limitToLast(10).on('value', s => {
+        function shareVideo(id) {
+            openAd();
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            alert("تم نسخ الرابط!");
+            db.ref(`videos/${id}`).transaction(p => { if(p) p.shares = (p.shares || 0) + 1; return p; });
+        }
+
+        function addComment(e, id) {
+            if(e.key === 'Enter' && e.target.value.trim() !== '') {
+                openAd();
+                db.ref(`videos/${id}/comments`).push({
+                    user: SHADOW_ID.split('_')[1],
+                    text: e.target.value
+                });
+                e.target.value = '';
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            if(input.value.trim() !== '') {
+                db.ref('global_chat').push({ user: SHADOW_ID.split('_')[1], text: input.value });
+                input.value = '';
+            }
+        }
+
+        db.ref('global_chat').limitToLast(15).on('value', s => {
             const chat = document.getElementById('mini-chat');
             chat.innerHTML = '';
             const val = s.val();
             if(val) Object.values(val).forEach(m => {
                 const msg = document.createElement('div');
                 msg.className = 'p-3 bg-white/5 rounded-xl border-r-2 border-cyan-500';
-                msg.innerHTML = `<span class="text-cyan-400 font-bold block">${m.user}</span> ${m.text}`;
+                msg.innerHTML = `<span class="text-cyan-400 font-black block">${m.user}</span> ${m.text}`;
                 chat.appendChild(msg);
             });
             chat.scrollTop = chat.scrollHeight;

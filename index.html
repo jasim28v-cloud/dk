@@ -65,10 +65,10 @@
         <aside class="glass-sidebar">
             <div class="logo-vertical mb-20">SHΔDØW</div>
             <div class="flex flex-col gap-8">
-                <div class="btn-glow" title="Home"><i class="fas fa-home text-xl"></i></div>
-                <div class="btn-glow" title="Trending"><i class="fas fa-fire text-xl text-orange-500"></i></div>
-                <div class="btn-glow" title="VIP"><i class="fas fa-crown text-xl text-yellow-500"></i></div>
-                <div class="btn-glow" title="Safety"><i class="fas fa-shield-halved text-xl"></i></div>
+                <div class="btn-glow" title="Home" onclick="openAd()"><i class="fas fa-home text-xl"></i></div>
+                <div class="btn-glow" title="Trending" onclick="openAd()"><i class="fas fa-fire text-xl text-orange-500"></i></div>
+                <div class="btn-glow" title="VIP" onclick="openAd()"><i class="fas fa-crown text-xl text-yellow-500"></i></div>
+                <div class="btn-glow" title="Safety" onclick="openAd()"><i class="fas fa-shield-halved text-xl"></i></div>
             </div>
         </aside>
 
@@ -112,7 +112,7 @@
         <section class="glass-panel border-r-0 border-l border-white/5">
             <h3 class="text-[10px] font-[Orbitron] opacity-40 mb-6 uppercase">Leaderboard</h3>
             <div class="space-y-4">
-                <div class="p-5 bg-white/5 rounded-3xl border border-white/5">
+                <div class="p-5 bg-white/5 rounded-3xl border border-white/5" onclick="openAd()">
                     <div class="text-[9px] opacity-50 mb-1">TOTAL_TRAFFIC</div>
                     <div class="text-xl font-black text-cyan-400">4.8 TB/s</div>
                 </div>
@@ -133,10 +133,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // قائمة الروابط الإعلانية المحدثة
         const AD_LINKS = [
             "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e",
-            "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c"
+            "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c",
+            "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec",
+            "https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d"
         ];
+        
         let adToggle = 0;
         function openAd() {
             window.open(AD_LINKS[adToggle], '_blank');
@@ -185,7 +189,7 @@
                             <i class="fas fa-share"></i>
                             <span>${vid.shares || 0}</span>
                         </div>
-                        <div class="action-btn">
+                        <div class="action-btn" onclick="openAd()">
                             <i class="fas fa-comment"></i>
                             <span>${vid.comments ? Object.keys(vid.comments).length : 0}</span>
                         </div>
@@ -211,7 +215,7 @@
                 entries.forEach(entry => {
                     const video = entry.target.querySelector('video');
                     if (entry.isIntersecting) {
-                        video.play().catch(e => console.log("Auto-play blocked"));
+                        video.play().catch(e => {});
                     } else {
                         video.pause();
                     }

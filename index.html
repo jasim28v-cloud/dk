@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GENESIS | ULTIMATE PRO</title>
+    <title>GENESIS | NEON COLOR EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -12,79 +12,78 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
         :root { --neon-color: #00f3ff; }
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; transition: background 0.8s ease-in-out; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; transition: background 0.8s ease; }
         
-        /* محرك التمرير */
         .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; position: relative; z-index: 10; }
         .scroll-engine::-webkit-scrollbar { display: none; }
         
-        .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        
-        /* حاوية الفيديو */
+        .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
         .video-container { width: 100%; height: 100%; position: relative; background: #000; }
-        video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* الأزرار في المنتصف */
-        .middle-controls { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 30px; z-index: 100; align-items: center; }
-        
-        .control-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
-        .icon-box { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); transition: 0.3s; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .icon-box:active { transform: scale(0.9); background: var(--neon-color); color: #000; }
+        /* أيقونة اللون المتغير عند التمرير */
+        .color-indicator { position: absolute; top: 120px; left: 20px; width: 12px; height: 12px; border-radius: 50%; background: var(--neon-color); box-shadow: 0 0 15px var(--neon-color); z-index: 100; transition: 0.5s; }
 
-        /* العلامة المائية */
-        .pro-watermark { position: absolute; top: 100px; right: 20px; font-family: 'Orbitron'; font-size: 12px; font-weight: 900; color: var(--neon-color); background: rgba(0,0,0,0.4); padding: 6px 15px; border-radius: 10px; border-right: 4px solid var(--neon-color); z-index: 50; letter-spacing: 2px; text-shadow: 0 0 8px var(--neon-color); pointer-events: none; }
+        .middle-controls { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; z-index: 100; align-items: center; }
+        .icon-box { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); transition: 0.3s; font-size: 1.2rem; }
+        .icon-box i { color: var(--neon-color); filter: drop-shadow(0 0 5px var(--neon-color)); }
 
-        .glass-header { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .digital-clock { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #fff; text-shadow: 0 0 10px var(--neon-color); }
-        
-        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px; height: 70px; border-radius: 30px; display: flex; justify-content: space-around; align-items: center; z-index: 500; border: 1px solid rgba(255,255,255,0.1); }
-        .upload-btn { width: 55px; height: 55px; background: #fff; color: #000; border-radius: 20px; display: flex; align-items: center; justify-content: center; transform: translateY(-12px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .pro-watermark { position: absolute; top: 100px; right: 20px; font-family: 'Orbitron'; font-size: 10px; color: var(--neon-color); border: 1px solid var(--neon-color); padding: 4px 10px; border-radius: 5px; z-index: 50; text-shadow: 0 0 5px var(--neon-color); pointer-events: none; }
 
-        /* أنيميشن القلب */
-        .heart-pop { position: absolute; font-size: 90px; color: #ff2d55; pointer-events: none; z-index: 1000; animation: heartFade 0.8s ease-out forwards; text-shadow: 0 0 20px rgba(255, 45, 85, 0.5); }
-        @keyframes heartFade { 0% { transform: scale(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: scale(1.6) translateY(-40px); opacity: 0; } }
+        .glass-ui { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px; height: 70px; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 500; }
+        .upload-btn { width: 55px; height: 55px; background: #fff; color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; transform: translateY(-12px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); cursor: pointer; }
+
+        /* لوحة التحكم مع صور الفيديوهات */
+        #admin-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.95); backdrop-filter: blur(30px); padding: 20px; overflow-y: auto; }
+        .admin-card { background: rgba(255,255,255,0.03); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); position: relative; }
+        .admin-card video { height: 180px; width: 100%; object-fit: cover; pointer-events: none; }
+        .delete-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); }
+
+        .heart-pop { position: absolute; font-size: 80px; color: #ff2d55; pointer-events: none; z-index: 1000; animation: heartFade 0.7s ease-out forwards; }
+        @keyframes heartFade { 0% { transform: scale(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <header class="fixed top-0 w-full z-[200] glass-header p-4 flex justify-between items-center">
-        <div class="digital-clock" id="clock-display">00:00:00</div>
-        <div class="text-[10px] font-[Orbitron] tracking-[3px] text-cyan-400">GENESIS_SYSTEM</div>
+    <header class="fixed top-0 w-full z-[200] glass-ui p-4 flex justify-between items-center rounded-b-2xl">
+        <div class="font-[Orbitron] text-lg" style="color: var(--neon-color)" id="clock-display">00:00:00</div>
+        <div class="text-[9px] font-[Orbitron] tracking-[4px] opacity-50">GENESIS_CORE</div>
     </header>
 
-    <div class="scroll-engine" id="video-stack">
-        </div>
+    <div class="scroll-engine" id="video-stack"></div>
 
-    <nav class="bottom-nav glass-header">
-        <div onclick="location.reload()"><i class="fas fa-home opacity-60 text-xl"></i></div>
-        <div onclick="toggleChat()"><i class="fas fa-comment-dots opacity-60 text-xl"></i></div>
-        <div id="upload-trigger" class="upload-btn"><i class="fas fa-plus text-2xl"></i></div>
-        <div onclick="toggleAdmin()"><i class="fas fa-shield-virus opacity-60 text-xl"></i></div>
-        <div onclick="shareApp()"><i class="fas fa-share-nodes opacity-60 text-xl"></i></div>
+    <nav class="bottom-nav glass-ui">
+        <div onclick="location.reload()"><i class="fas fa-th-large opacity-50"></i></div>
+        <div onclick="toggleChat()"><i class="fas fa-comment-dots opacity-50"></i></div>
+        <div id="upload-trigger" class="upload-btn"><i class="fas fa-plus text-xl"></i></div>
+        <div onclick="toggleAdmin()"><i class="fas fa-sliders-h opacity-50"></i></div>
+        <div onclick="shareApp()"><i class="fas fa-share-alt opacity-50"></i></div>
     </nav>
 
-    <div id="admin-overlay" class="fixed inset-0 z-[1000] glass-header hidden p-6 overflow-y-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-cyan-400 text-xl">DASHBOARD</h2>
+    <div id="admin-overlay">
+        <div class="flex justify-between items-center mb-8 sticky top-0 bg-black/50 p-3 rounded-2xl">
+            <h2 class="font-[Orbitron] text-red-500">ADMIN_DELETE</h2>
             <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleAdmin()"></i>
         </div>
-        <div id="admin-grid" class="grid grid-cols-2 gap-4 pb-28"></div>
+        <div id="admin-grid" class="grid grid-cols-2 gap-4 pb-32">
+            </div>
     </div>
 
-    <div id="chat-overlay" class="fixed inset-0 z-[1000] glass-header hidden flex-col p-6">
+    <div id="chat-overlay" class="fixed inset-0 z-[1000] glass-ui hidden flex-col p-6">
         <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
-            <span class="font-[Orbitron]">GLOBAL_STREAM</span>
+            <span class="font-[Orbitron]">MESSAGES</span>
             <i class="fas fa-times text-xl cursor-pointer" onclick="toggleChat()"></i>
         </div>
-        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 p-2"></div>
-        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] flex gap-2">
-            <input type="text" id="msg-input" class="flex-1 bg-white/10 p-4 rounded-2xl outline-none" placeholder="اكتب رسالة...">
-            <button onclick="sendChat()" class="text-cyan-400 p-2"><i class="fas fa-paper-plane text-2xl"></i></button>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 p-2"></div>
+        <div class="flex gap-2 mt-4 mb-20">
+            <input type="text" id="msg-input" class="flex-1 bg-white/5 p-4 rounded-xl outline-none" placeholder="اكتب شيئاً...">
+            <button onclick="sendChat()" class="text-cyan-400"><i class="fas fa-paper-plane text-2xl"></i></button>
         </div>
     </div>
 
     <script>
-        const SHADOW_ID = localStorage.getItem('shadow_uid') || 'GEN_' + Math.random().toString(36).substr(2, 4).toUpperCase();
+        const SHADOW_ID = localStorage.getItem('shadow_uid') || 'G_' + Math.random().toString(36).substr(2, 4).toUpperCase();
         localStorage.setItem('shadow_uid', SHADOW_ID);
 
         const firebaseConfig = { databaseURL: "https://project-717e4-default-rtdb.firebaseio.com/" };
@@ -95,89 +94,77 @@
             "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c",
             "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"
         ];
-        let adCount = 0;
-        function openAd() { window.open(AD_LINKS[adCount], '_blank'); adCount = (adCount + 1) % AD_LINKS.length; }
+        let adIdx = 0;
+        function openAd() { window.open(AD_LINKS[adIdx], '_blank'); adIdx = (adIdx + 1) % AD_LINKS.length; }
 
         function updateClock() { document.getElementById('clock-display').textContent = new Date().toLocaleTimeString('en-GB'); }
         setInterval(updateClock, 1000);
 
-        // جلب الفيديوهات
         db.ref('videos').on('value', (snapshot) => {
             const container = document.getElementById('video-stack');
             const adminGrid = document.getElementById('admin-grid');
             const data = snapshot.val();
-            container.innerHTML = ''; adminGrid.innerHTML = '';
             if(!data) return;
 
+            container.innerHTML = ''; adminGrid.innerHTML = '';
             Object.keys(data).reverse().forEach(id => {
                 const vid = data[id];
+                
+                // إضافة الفيديو للواجهة الرئيسية
                 const section = document.createElement('section');
                 section.className = 'video-segment';
                 section.innerHTML = `
                     <div class="video-container">
+                        <div class="color-indicator"></div>
                         <div class="pro-watermark">GENESIS PRO</div>
-                        <video loop playsinline src="${vid.url}" onclick="handleVideoTap(event, '${id}')"></video>
-                        
+                        <video loop playsinline preload="metadata" src="${vid.url}" onclick="handleTap(event, '${id}')"></video>
                         <div class="middle-controls">
-                            <div class="control-item" onclick="likeAction('${id}')">
+                            <div class="flex flex-col items-center" onclick="like('${id}')">
                                 <div class="icon-box"><i class="fas fa-heart ${vid.likedBy && vid.likedBy[SHADOW_ID] ? 'text-red-500' : ''}"></i></div>
-                                <span class="text-[10px] font-bold">${vid.likes || 0}</span>
+                                <span class="text-[10px] mt-1 font-bold">${vid.likes || 0}</span>
                             </div>
-                            <div class="control-item" onclick="shareAction()">
-                                <div class="icon-box"><i class="fas fa-share-nodes text-cyan-400"></i></div>
-                                <span class="text-[8px] opacity-60 text-white">إعلان</span>
-                            </div>
-                            <div class="control-item" onclick="muteAction(this)">
-                                <div class="icon-box"><i class="fas fa-volume-up"></i></div>
-                            </div>
+                            <div class="icon-box" onclick="openAd()"><i class="fas fa-share-nodes"></i></div>
+                            <div class="icon-box" onclick="mute(this)"><i class="fas fa-volume-up"></i></div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(section);
 
+                // إضافة صور الفيديوهات للوحة التحكم
                 adminGrid.innerHTML += `
-                    <div class="bg-white/5 p-2 rounded-2xl text-center border border-white/5">
-                        <video src="${vid.url}" class="h-28 w-full object-cover rounded-xl mb-2" muted></video>
-                        <button onclick="deleteVid('${id}')" class="text-red-500 text-[10px] uppercase font-black">Delete Item</button>
-                    </div>
-                `;
+                    <div class="admin-card">
+                        <video src="${vid.url}#t=1" muted preload="metadata"></video>
+                        <button onclick="deleteVid('${id}')" class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                    </div>`;
             });
-            initScrollObserver();
+            initObserver();
         });
 
-        let tapTimer = 0;
-        function handleVideoTap(e, id) {
+        let tapTime = 0;
+        function handleTap(e, id) {
             const now = Date.now();
-            if (now - tapTimer < 300) {
-                likeAction(id);
-                showHeartPop(e);
+            if (now - tapTime < 300) {
+                like(id);
+                const h = document.createElement('i');
+                h.className = 'fas fa-heart heart-pop';
+                h.style.left = e.clientX - 40 + 'px'; h.style.top = e.clientY - 40 + 'px';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 700);
             } else {
                 const v = e.target;
                 v.paused ? v.play() : v.pause();
             }
-            tapTimer = now;
+            tapTime = now;
         }
 
-        function showHeartPop(e) {
-            const h = document.createElement('i');
-            h.className = 'fas fa-heart heart-pop';
-            h.style.left = (e.clientX || e.pageX) - 45 + 'px';
-            h.style.top = (e.clientY || e.pageY) - 45 + 'px';
-            document.body.appendChild(h);
-            setTimeout(() => h.remove(), 800);
-        }
-
-        function likeAction(id) { db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); db.ref(`videos/${id}/likedBy/${SHADOW_ID}`).set(true); }
-        function shareAction() { openAd(); }
-        function muteAction(btn) { openAd(); const v = btn.closest('.video-container').querySelector('video'); v.muted = !v.muted; btn.querySelector('i').className = v.muted ? 'fas fa-volume-mute text-red-400' : 'fas fa-volume-up'; }
-        
-        function shareApp() { navigator.share({title: 'Genesis Pro', url: window.location.href}).catch(()=>{}); }
+        function like(id) { db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); db.ref(`videos/${id}/likedBy/${SHADOW_ID}`).set(true); }
+        function mute(btn) { openAd(); const v = btn.closest('.video-container').querySelector('video'); v.muted = !v.muted; btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute text-red-500"></i>' : '<i class="fas fa-volume-up"></i>'; }
+        function shareApp() { navigator.share({url: window.location.href}).catch(()=>{}); }
+        function toggleAdmin() { const a = document.getElementById('admin-overlay'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; }
         function toggleChat() { document.getElementById('chat-overlay').classList.toggle('hidden'); document.getElementById('chat-overlay').classList.toggle('flex'); }
-        function toggleAdmin() { document.getElementById('admin-overlay').classList.toggle('hidden'); }
-        function deleteVid(id) { if(confirm('حذف هذا الفيديو نهائياً؟')) db.ref(`videos/${id}`).remove(); }
+        function deleteVid(id) { if(confirm('حذف هذا الفيديو بشكل نهائي؟')) db.ref(`videos/${id}`).remove(); }
 
         const widget = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "bjebvo5p" }, (err, res) => {
-            if (!err && res.event === "success") { db.ref('videos/').push({ url: res.info.secure_url, sender: SHADOW_ID, likes: 0, time: Date.now() }); }
+            if (!err && res.event === "success") { db.ref('videos/').push({ url: res.info.secure_url, sender: SHADOW_ID, likes: 0 }); }
         });
         document.getElementById("upload-trigger").onclick = () => widget.open();
 
@@ -186,23 +173,29 @@
             if(i.value.trim()){ db.ref('global_chat').push({u:SHADOW_ID, t:i.value}); i.value=''; }
         }
 
-        db.ref('global_chat').limitToLast(20).on('value', s => {
+        db.ref('global_chat').limitToLast(15).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
             s.forEach(m => {
                 const d = m.val();
-                box.innerHTML += `<div class="bg-white/5 p-3 rounded-2xl"><b class="text-[9px] text-cyan-400 block mb-1">${d.u}</b><p class="text-sm">${d.t}</p></div>`;
+                box.innerHTML += `<div class="bg-white/5 p-3 rounded-xl"><b class="text-[9px] text-cyan-400">${d.u}</b><p class="text-sm">${d.t}</p></div>`;
             });
             box.scrollTop = box.scrollHeight;
         });
 
-        function initScrollObserver() {
-            const bgColors = ['#0f0c29', '#000428', '#1a2a6c', '#200122', '#000000'];
+        function initObserver() {
+            const colorPalettes = ['#00f3ff', '#ff00ff', '#00ffaa', '#ff4d00', '#ffff00'];
+            const bgPalettes = ['#0f0c29', '#000428', '#1a2a6c', '#200122', '#000000'];
+            
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const video = entry.target.querySelector('video');
                     if (entry.isIntersecting) {
                         video && video.play().catch(()=>{});
-                        document.body.style.background = bgColors[Math.floor(Math.random() * bgColors.length)];
+                        const randomColor = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+                        const randomBg = bgPalettes[Math.floor(Math.random() * bgPalettes.length)];
+                        
+                        document.documentElement.style.setProperty('--neon-color', randomColor);
+                        document.body.style.background = randomBg;
                     } else { video && video.pause(); }
                 });
             }, { threshold: 0.6 });

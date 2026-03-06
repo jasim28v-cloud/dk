@@ -19,7 +19,7 @@
         .scroll-engine::-webkit-scrollbar { display: none; }
         
         .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        video { width: 100%; height: 100%; object-fit: cover; }
+        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
 
         .glass-ui { background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
         .neon-border { border-color: var(--neon-color) !important; box-shadow: 0 0 10px var(--neon-color); }
@@ -60,12 +60,10 @@
             user-select: none;
         }
 
-        /* تنسيق زر الرفع المميز */
         #upload-trigger {
             background: var(--upload-color);
             color: #000;
             box-shadow: 0 0 20px var(--upload-color);
-            border: none;
         }
 
         .admin-panel { position: fixed; inset: 0; z-index: 500; background: #050505; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
@@ -98,7 +96,7 @@
         <i class="fas fa-home neon-text text-xl"></i>
         <i class="fas fa-comment-dots opacity-60 hover:opacity-100 transition-opacity" onclick="toggleChat()"></i>
         <div id="upload-trigger" class="w-12 h-12 rounded-xl flex items-center justify-center active:scale-90 transition-transform cursor-pointer">
-            <i class="fas fa-cloud-arrow-up text-lg"></i>
+            <i class="fas fa-video text-lg"></i>
         </div>
         <i class="fas fa-random opacity-60 hover:opacity-100 transition-opacity" onclick="shuffleProtocol()"></i>
     </nav>
@@ -166,7 +164,11 @@
             const data = snapshot.val();
             container.innerHTML = '';
             adminList.innerHTML = '';
-            if(!data) return;
+            
+            if(!data) {
+                container.innerHTML = '<div class="h-full flex items-center justify-center opacity-20 text-xs">NO_DATA_STREAM</div>';
+                return;
+            }
             
             const sorted = Object.keys(data).map(id => ({ id, ...data[id] })).sort((a, b) => b.timestamp - a.timestamp);
             
@@ -174,9 +176,11 @@
                 const section = document.createElement('section');
                 section.className = 'video-segment';
                 const isLiked = vid.likedBy && vid.likedBy[SHADOW_ID];
+                
+                // إضافة النوع والسمات لضمان التشغيل
                 section.innerHTML = `
                     <div class="watermark">SHΔDØW GENESIS</div>
-                    <video loop playsinline src="${vid.url}" onclick="togglePlay(this)"></video>
+                    <video loop playsinline preload="auto" src="${vid.url}" onclick="togglePlay(this)"></video>
                     <div class="video-info">
                         <div class="text-[10px] opacity-50 mb-1">SOURCE: ${vid.sender || 'UNKNOWN'}</div>
                         <div class="text-xs font-bold tracking-tighter neon-text">PROTOCOL_${vid.id.substr(-4)}</div>
@@ -207,11 +211,11 @@
                 `;
                 adminList.appendChild(card);
             });
-            initScroll();
+            setTimeout(initScroll, 500);
         });
 
         function togglePlay(v) {
-            if (v.paused) v.play();
+            if (v.paused) v.play().catch(e => console.log("Play blocked"));
             else v.pause();
         }
 
@@ -248,41 +252,35 @@
             toggleChat();
         }
 
-        // إعداد الرفع المحسن
+        // تحسين الرفع لضمان أن الفيديو متاح للعامة
         const myWidget = cloudinary.createUploadWidget({ 
             cloudName: "dssk5tabb", 
             uploadPreset: "bjebvo5p", 
-            sources: ['local', 'camera', 'url'],
-            multiple: false,
-            clientAllowedFormats: ["mp4", "mov", "webm"],
-            maxFileSize: 50000000, // 50MB
+            resourceType: "video",
+            clientAllowedFormats: ["mp4", "webm", "mov"],
+            maxFileSize: 60000000, 
             styles: {
                 palette: {
                     window: "#000000",
                     sourceBg: "#000000",
                     windowBorder: "#ffcc00",
                     tabIcon: "#ffcc00",
-                    inactiveTabIcon: "#555555",
-                    menuIcons: "#ffcc00",
-                    link: "#ffcc00",
-                    action: "#ffcc00",
-                    inProgress: "#00f3ff",
-                    complete: "#33ff00",
-                    error: "#ff0000",
-                    textDark: "#000000",
                     textLight: "#ffffff"
                 }
             }
         }, (err, res) => {
             if (!err && res.event === "success") {
+                // استخدام res.info.secure_url مباشرة
                 db.ref('videos/').push({ 
                     url: res.info.secure_url, 
                     sender: SHADOW_ID, 
                     likes: 0, 
                     timestamp: Date.now() 
+                }).then(() => {
+                    alert("PROTOCOL_UPLOAD_SUCCESSFUL");
+                    window.location.reload(); // إعادة التحميل للتأكد من التحديث
                 });
                 addXP(200);
-                alert("PROTOCOL_UPLOAD_SUCCESSFUL");
             }
         });
 
@@ -338,21 +336,25 @@
             const obs = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if(e.isIntersecting) {
+                    if(e.isIntersecting && v) {
                         v.play().catch(()=>{});
                         const colors = ['#00f3ff', '#ff0055', '#00ffaa', '#ccff00', '#7000ff', '#ffaa00'];
                         document.documentElement.style.setProperty('--neon-color', colors[Math.floor(Math.random()*colors.length)]);
-                    } else { 
+                    } else if(v) { 
                         v.pause(); 
                         v.currentTime = 0; 
                     }
                 });
-            }, { threshold: 0.7 });
+            }, { threshold: 0.6 });
             document.querySelectorAll('.video-segment').forEach(s => obs.observe(s));
         }
 
+        // تفعيل الصوت والتشغيل عند أول لمسة
         document.addEventListener('touchstart', () => { 
-            document.querySelectorAll('video').forEach(v => v.muted = false); 
+            document.querySelectorAll('video').forEach(v => {
+                v.muted = false;
+                v.play().catch(()=>{});
+            });
         }, { once: true });
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GENESIS | ULTIMATE LOAD</title>
+    <title>GENESIS | NEON COLOR EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,22 +11,17 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
-        :root { --neon-color: #00f3ff; }
+        :root { --neon-color: #00f3ff; --upload-pink: #ff007f; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; transition: background 0.8s ease; }
         
-        /* شاشة التحميل البدائية */
-        #preloader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.5s; }
-        .loader-ring { width: 80px; height: 80px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--neon-color); border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 15px var(--neon-color); }
-        .loader-text { margin-top: 20px; font-family: 'Orbitron'; font-size: 12px; letter-spacing: 5px; color: var(--neon-color); animation: pulse 1.5s infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
         .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; position: relative; z-index: 10; }
         .scroll-engine::-webkit-scrollbar { display: none; }
         
         .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
         .video-container { width: 100%; height: 100%; position: relative; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; }
+
+        .color-indicator { position: absolute; top: 120px; left: 20px; width: 12px; height: 12px; border-radius: 50%; background: var(--neon-color); box-shadow: 0 0 15px var(--neon-color); z-index: 100; transition: 0.5s; }
 
         .middle-controls { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; z-index: 100; align-items: center; }
         .icon-box { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); transition: 0.3s; font-size: 1.2rem; }
@@ -36,25 +31,40 @@
 
         .glass-ui { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px; height: 70px; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 500; }
-        .upload-btn { width: 55px; height: 55px; background: #fff; color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; transform: translateY(-12px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); cursor: pointer; }
+        .upload-btn { width: 55px; height: 55px; background: var(--upload-pink); color: #fff; border-radius: 18px; display: flex; align-items: center; justify-content: center; transform: translateY(-12px); box-shadow: 0 5px 20px rgba(255, 0, 127, 0.5); cursor: pointer; transition: 0.3s; }
+        .upload-btn:hover { background: #fff; color: var(--upload-pink); box-shadow: 0 5px 25px rgba(255, 255, 255, 0.6); }
 
-        /* لوحة التحكم مع صور معاينة ثابتة */
         #admin-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.95); backdrop-filter: blur(30px); padding: 20px; overflow-y: auto; }
-        .admin-card { background: rgba(255,255,255,0.03); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); position: relative; height: 180px; }
-        .admin-card img, .admin-card video { width: 100%; height: 100%; object-fit: cover; }
-        .delete-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.8); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(255,255,255,0.2); }
+        .admin-card { background: rgba(255,255,255,0.03); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); position: relative; }
+        .admin-card video { height: 180px; width: 100%; object-fit: cover; pointer-events: none; }
+        .delete-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); }
+
+        .heart-pop { position: absolute; font-size: 80px; color: #ff2d55; pointer-events: none; z-index: 1000; animation: heartFade 0.7s ease-out forwards; }
+        @keyframes heartFade { 0% { transform: scale(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+        .video-overlay-info { position: absolute; bottom: 100px; right: 20px; text-align: right; z-index: 100; max-width: 70%; pointer-events: none; }
+        .video-username { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; display: block; color: var(--neon-color); text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .video-description { font-size: 0.9rem; line-height: 1.4; color: #eee; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
+
+        .input-field { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; color: white; width: 100%; margin-bottom: 10px; outline: none; }
+        .input-field:focus { border-color: var(--neon-color); }
+
+        .video-video-watermark { position: absolute; font-family: 'Orbitron'; color: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.1); padding: 5px 15px; border-radius: 8px; font-size: 12px; pointer-events: none; letter-spacing: 2px; text-transform: uppercase; }
+        .v-watermark-1 { top: 20px; left: 20px; transform: rotate(-5deg); }
+        .v-watermark-2 { bottom: 20px; right: 20px; transform: rotate(5deg); }
+
+        #upload-overlay { display: none; position: fixed; inset: 0; z-index: 1100; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); align-items: center; justify-content: center; padding: 20px; }
+        .upload-modal { background: #111; border: 1px solid var(--upload-pink); padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(255, 0, 127, 0.3); }
+        .pink-gradient-text { background: linear-gradient(to right, #ff007f, #ff66b2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+        .pink-btn { background: var(--upload-pink); color: white; border-radius: 12px; padding: 12px 25px; cursor: pointer; border: none; font-size: 1rem; transition: 0.3s; width: 100%; }
+        .pink-btn:hover { background: #fff; color: var(--upload-pink); }
     </style>
 </head>
 <body>
 
-    <div id="preloader">
-        <div class="loader-ring"></div>
-        <div class="loader-text">LOADING GENESIS</div>
-    </div>
-
-    <header class="fixed top-0 w-full z-[200] glass-ui p-4 flex justify-between items-center">
+    <header class="fixed top-0 w-full z-[200] glass-ui p-4 flex justify-between items-center rounded-b-2xl">
         <div class="font-[Orbitron] text-lg" style="color: var(--neon-color)" id="clock-display">00:00:00</div>
-        <div class="text-[9px] font-[Orbitron] tracking-[3px] opacity-50">GENESIS_SYSTEM</div>
+        <div class="text-[9px] font-[Orbitron] tracking-[4px] opacity-50">GENESIS_CORE</div>
     </header>
 
     <div class="scroll-engine" id="video-stack"></div>
@@ -62,13 +72,13 @@
     <nav class="bottom-nav glass-ui">
         <div onclick="location.reload()"><i class="fas fa-th-large opacity-50"></i></div>
         <div onclick="toggleChat()"><i class="fas fa-comment-dots opacity-50"></i></div>
-        <div id="upload-trigger" class="upload-btn"><i class="fas fa-plus text-xl"></i></div>
-        <div onclick="toggleAdmin()"><i class="fas fa-sliders-h opacity-50"></i></div>
+        <div id="upload-action" class="upload-btn"><i class="fas fa-cloud-upload-alt text-xl"></i></div>
+        <div onclick="requestAdmin()"><i class="fas fa-sliders-h opacity-50"></i></div>
         <div onclick="shareApp()"><i class="fas fa-share-alt opacity-50"></i></div>
     </nav>
 
     <div id="admin-overlay">
-        <div class="flex justify-between items-center mb-8 sticky top-0 bg-black/50 p-3 rounded-2xl z-50">
+        <div class="flex justify-between items-center mb-8 sticky top-0 bg-black/50 p-3 rounded-2xl">
             <h2 class="font-[Orbitron] text-red-500">ADMIN_DELETE</h2>
             <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleAdmin()"></i>
         </div>
@@ -84,6 +94,16 @@
         <div class="flex gap-2 mt-4 mb-20">
             <input type="text" id="msg-input" class="flex-1 bg-white/5 p-4 rounded-xl outline-none" placeholder="اكتب شيئاً...">
             <button onclick="sendChat()" class="text-cyan-400"><i class="fas fa-paper-plane text-2xl"></i></button>
+        </div>
+    </div>
+
+    <div id="upload-overlay">
+        <div class="upload-modal">
+            <h2 class="font-[Orbitron] text-2xl mb-6 pink-gradient-text">UPLOAD VIDEO</h2>
+            <input type="text" id="up-username" class="input-field" placeholder="اسم المستخدم (إختياري)">
+            <textarea id="up-description" class="input-field h-24 resize-none" placeholder="وصف الفيديو..."></textarea>
+            <button id="up-select-btn" class="pink-btn font-bold"><i class="fas fa-file-video ml-2"></i>اختر الفيديو وانشر</button>
+            <button onclick="toggleUpload()" class="mt-4 text-sm text-gray-400">إلغاء</button>
         </div>
     </div>
 
@@ -105,14 +125,6 @@
         function updateClock() { document.getElementById('clock-display').textContent = new Date().toLocaleTimeString('en-GB'); }
         setInterval(updateClock, 1000);
 
-        // إخفاء شاشة التحميل عند جاهزية الصفحة
-        window.onload = () => {
-            setTimeout(() => {
-                document.getElementById('preloader').style.opacity = '0';
-                setTimeout(() => document.getElementById('preloader').style.display = 'none', 500);
-            }, 2000);
-        };
-
         db.ref('videos').on('value', (snapshot) => {
             const container = document.getElementById('video-stack');
             const adminGrid = document.getElementById('admin-grid');
@@ -127,8 +139,17 @@
                 section.className = 'video-segment';
                 section.innerHTML = `
                     <div class="video-container">
-                        <div class="pro-watermark">GENESIS PRO</div>
                         <video loop playsinline preload="metadata" src="${vid.url}" onclick="handleTap(event, '${id}')"></video>
+                        
+                        <div class="video-video-watermark v-watermark-1">GENESIS</div>
+                        <div class="video-video-watermark v-watermark-2">© GENESIS 2024</div>
+
+                        <div class="color-indicator"></div>
+                        <div class="pro-watermark">GENESIS PRO</div>
+                        <div class="video-overlay-info">
+                            <span class="video-username">@${vid.username || 'Ghost_User'}</span>
+                            <p class="video-description">${vid.description || ''}</p>
+                        </div>
                         <div class="middle-controls">
                             <div class="flex flex-col items-center" onclick="like('${id}')">
                                 <div class="icon-box"><i class="fas fa-heart ${vid.likedBy && vid.likedBy[SHADOW_ID] ? 'text-red-500' : ''}"></i></div>
@@ -140,11 +161,10 @@
                     </div>`;
                 container.appendChild(section);
 
-                // إظهار الفيديو كـ صورة (thumbnail) في الإعدادات
                 adminGrid.innerHTML += `
                     <div class="admin-card">
-                        <video src="${vid.url}#t=0.5" muted preload="metadata"></video>
-                        <button onclick="deleteVid('${id}')" class="delete-btn"><i class="fas fa-trash"></i></button>
+                        <video src="${vid.url}#t=1" muted preload="metadata"></video>
+                        <button onclick="deleteVid('${id}')" class="delete-btn"><i class="fas fa-trash-alt"></i></button>
                     </div>`;
             });
             initObserver();
@@ -156,7 +176,7 @@
             if (now - tapTime < 300) {
                 like(id);
                 const h = document.createElement('i');
-                h.className = 'fas fa-heart fixed text-7xl text-red-500 z-[1000] pointer-events-none animate-ping';
+                h.className = 'fas fa-heart heart-pop';
                 h.style.left = e.clientX - 40 + 'px'; h.style.top = e.clientY - 40 + 'px';
                 document.body.appendChild(h);
                 setTimeout(() => h.remove(), 700);
@@ -171,13 +191,39 @@
         function mute(btn) { openAd(); const v = btn.closest('.video-container').querySelector('video'); v.muted = !v.muted; btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute text-red-500"></i>' : '<i class="fas fa-volume-up"></i>'; }
         function shareApp() { navigator.share({url: window.location.href}).catch(()=>{}); }
         function toggleAdmin() { const a = document.getElementById('admin-overlay'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; }
+        
+        function requestAdmin() {
+            const code = prompt("أدخل رمز الدخول للوحة التحكم:");
+            if(code === "123") {
+                toggleAdmin();
+            } else if(code !== null) {
+                alert("الرمز خطأ.");
+            }
+        }
+
         function toggleChat() { document.getElementById('chat-overlay').classList.toggle('hidden'); document.getElementById('chat-overlay').classList.toggle('flex'); }
-        function deleteVid(id) { if(confirm('حذف نهائي؟')) db.ref(`videos/${id}`).remove(); }
+        function toggleUpload() { const o = document.getElementById('upload-overlay'); o.style.display = o.style.display === 'flex' ? 'none' : 'flex'; }
+        function deleteVid(id) { if(confirm('حذف هذا الفيديو بشكل نهائي؟')) db.ref(`videos/${id}`).remove(); }
 
         const widget = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "bjebvo5p" }, (err, res) => {
-            if (!err && res.event === "success") { db.ref('videos/').push({ url: res.info.secure_url, sender: SHADOW_ID, likes: 0 }); }
+            if (!err && res.event === "success") { 
+                const username = document.getElementById('up-username').value;
+                const description = document.getElementById('up-description').value;
+                db.ref('videos/').push({ 
+                    url: res.info.secure_url, 
+                    sender: SHADOW_ID, 
+                    username: username || SHADOW_ID,
+                    description: description,
+                    likes: 0 
+                }); 
+                toggleUpload();
+                document.getElementById('up-username').value = '';
+                document.getElementById('up-description').value = '';
+            }
         });
-        document.getElementById("upload-trigger").onclick = () => widget.open();
+        
+        document.getElementById("upload-action").onclick = toggleUpload;
+        document.getElementById("up-select-btn").onclick = () => widget.open();
 
         function sendChat() {
             const i = document.getElementById('msg-input');
@@ -196,14 +242,17 @@
         function initObserver() {
             const colorPalettes = ['#00f3ff', '#ff00ff', '#00ffaa', '#ff4d00', '#ffff00'];
             const bgPalettes = ['#0f0c29', '#000428', '#1a2a6c', '#200122', '#000000'];
+            
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const video = entry.target.querySelector('video');
                     if (entry.isIntersecting) {
                         video && video.play().catch(()=>{});
                         const randomColor = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+                        const randomBg = bgPalettes[Math.floor(Math.random() * bgPalettes.length)];
+                        
                         document.documentElement.style.setProperty('--neon-color', randomColor);
-                        document.body.style.background = bgPalettes[Math.floor(Math.random() * bgPalettes.length)];
+                        document.body.style.background = randomBg;
                     } else { video && video.pause(); }
                 });
             }, { threshold: 0.6 });

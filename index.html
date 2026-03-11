@@ -15,8 +15,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
         :root { --neon-color: #00f3ff; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; }
-        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; transition: 0.5s; }
+        
+        /* تحسين سلاسة التمرير */
+        .scroll-engine { 
+            height: 100vh; 
+            overflow-y: scroll; 
+            scroll-snap-type: y mandatory; 
+            scrollbar-width: none; 
+            scroll-behavior: smooth; /* إضافة نعومة الحركة */
+            -webkit-overflow-scrolling: touch;
+        }
         .scroll-engine::-webkit-scrollbar { display: none; }
+        
         .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; border-bottom: 1px solid rgba(255,255,255,0.05); }
         video { width: 100%; height: 100%; object-fit: cover; }
         .glass-ui { background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
@@ -24,7 +34,7 @@
         .neon-text { color: var(--neon-color) !important; text-shadow: 0 0 5px var(--neon-color); }
         .xp-bar-container { position: fixed; top: 70px; left: 20px; width: 120px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; z-index: 150; }
         #xp-progress { height: 100%; width: 0%; background: var(--neon-color); border-radius: 10px; transition: 1s; }
-        .side-controls { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; z-index: 50; }
+        .side-controls { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; z-index: 50; }
         .glass-btn { width: 50px; height: 50px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; }
         .shuffle-btn { position: fixed; top: 80px; right: 20px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 100; border: 1px solid rgba(0,243,255,0.3); }
         .video-info { position: absolute; bottom: 100px; right: 20px; text-align: right; pointer-events: none; z-index: 40; }
@@ -86,13 +96,14 @@
 
     <script>
         const ADMIN_PASS = "1234";
+        const SPECIAL_AD_LINK = "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c";
         
-        // تم تحديث الروابط لتشمل رابط المنطقة #6855929 الجديد
         const AD_LINKS = [
             "https://periodicdisease.com/JYauq8",
             "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c"
         ];
         let currentAd = 0;
+        let isGlobalMuted = false;
 
         const SHADOW_ID = localStorage.getItem('shadow_uid') || 'UX_' + Math.random().toString(36).substr(2, 6).toUpperCase();
         localStorage.setItem('shadow_uid', SHADOW_ID);
@@ -106,6 +117,12 @@
             window.open(AD_LINKS[currentAd], '_blank');
             currentAd = (currentAd + 1) % AD_LINKS.length;
             addXP(10);
+        }
+
+        // وظيفة تشغيل إعلان الرابط الخاص عند الضغط على الصوت
+        function triggerSpecialAd() {
+            window.open(SPECIAL_AD_LINK, '_blank');
+            addXP(15);
         }
 
         function addXP(amount) {
@@ -123,7 +140,20 @@
         }
         updateXPUI();
 
-        // نظام جلب الفيديوهات من Firebase
+        // وظيفة التحكم بالصوت مع الإعلان
+        function toggleVolume(btn) {
+            triggerSpecialAd();
+            isGlobalMuted = !isGlobalMuted;
+            const videos = document.querySelectorAll('video');
+            videos.forEach(v => v.muted = isGlobalMuted);
+            
+            // تحديث شكل الأيقونة في كل الأزرار
+            const volIcons = document.querySelectorAll('.vol-icon');
+            volIcons.forEach(icon => {
+                icon.className = isGlobalMuted ? 'fas fa-volume-mute vol-icon text-red-500' : 'fas fa-volume-up vol-icon neon-text';
+            });
+        }
+
         db.ref('videos').on('value', (snapshot) => {
             const container = document.getElementById('video-stack');
             const adminList = document.getElementById('admin-list');
@@ -140,12 +170,16 @@
                 const isLiked = vid.likedBy && vid.likedBy[SHADOW_ID];
                 section.innerHTML = `
                     <div class="watermark">SHΔDØW GENESIS</div>
-                    <video loop playsinline src="${vid.url}" onclick="togglePlay(this)"></video>
+                    <video loop playsinline muted src="${vid.url}" onclick="togglePlay(this)"></video>
                     <div class="video-info">
                         <div class="text-[10px] opacity-50 mb-1">SOURCE: ${vid.sender || 'UNKNOWN'}</div>
                         <div class="text-xs font-bold tracking-tighter neon-text">PROTOCOL_${vid.id.substr(-4)}</div>
                     </div>
                     <div class="side-controls">
+                        <div class="glass-btn glass-ui" onclick="toggleVolume(this)">
+                            <i class="${isGlobalMuted ? 'fas fa-volume-mute text-red-500' : 'fas fa-volume-up neon-text'} vol-icon"></i>
+                            <span class="text-[8px] mt-1">VOL</span>
+                        </div>
                         <div class="glass-btn glass-ui ${isLiked ? 'neon-border neon-text' : ''}" onclick="toggleLike('${vid.id}')">
                             <i class="fas fa-heart ${isLiked ? 'animate-bounce' : ''}"></i>
                             <span class="text-[10px] font-black">${vid.likes || 0}</span>
@@ -212,7 +246,6 @@
             toggleChat();
         }
 
-        // إعدادات Cloudinary لرفع الفيديوهات
         const myWidget = cloudinary.createUploadWidget({ 
             cloudName: "dqzjfaqg4", 
             uploadPreset: "vox_god", 
@@ -281,6 +314,7 @@
                 entries.forEach(e => {
                     const v = e.target.querySelector('video');
                     if(e.isIntersecting) {
+                        v.muted = isGlobalMuted; // التأكد من حالة كتم الصوت عند الانتقال
                         v.play().catch(()=>{});
                         const colors = ['#00f3ff', '#ff0055', '#00ffaa', '#ccff00', '#7000ff', '#ffaa00'];
                         document.documentElement.style.setProperty('--neon-color', colors[Math.floor(Math.random()*colors.length)]);
@@ -289,12 +323,13 @@
                         v.currentTime = 0; 
                     }
                 });
-            }, { threshold: 0.7 });
+            }, { threshold: 0.6 }); // تم تقليل العتبة قليلاً لزيادة سرعة الاستجابة
             document.querySelectorAll('.video-segment').forEach(s => obs.observe(s));
         }
 
         document.addEventListener('touchstart', () => { 
-            document.querySelectorAll('video').forEach(v => v.muted = false); 
+            // تفعيل الصوت في المتصفحات بعد أول لمسة
+            document.querySelectorAll('video').forEach(v => v.muted = isGlobalMuted); 
         }, { once: true });
     </script>
 </body>

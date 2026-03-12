@@ -95,10 +95,12 @@
     </div>
 
     <script>
+        // SHADOW MIRAGE ONLINE 🔥🧠
         const ADMIN_CODE = "1234";
         const AD_LINKS = ["https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c", "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"];
         let currentAd = 0;
         let isMuted = true;
+        let globalVideoData = null; // مخزن البيانات لتجنب البناء المتكرر
         const USR_ID = "ION-" + Math.floor(Math.random()*999);
 
         const firebaseConfig = { databaseURL: "https://goms-8fdfd-default-rtdb.firebaseio.com" };
@@ -116,13 +118,16 @@
             icons.forEach(i => i.className = isMuted ? 'fas fa-volume-xmark mute-icon' : 'fas fa-volume-high mute-icon');
         }
 
+        // تحسين: فصل بناء الواجهة الرئيسية عن لوحة الإدارة لزيادة السرعة
         db.ref('videos').on('value', (snap) => {
             const container = document.getElementById('video-stack');
-            const adminList = document.getElementById('admin-list');
             const data = snap.val();
-            container.innerHTML = ''; adminList.innerHTML = '';
+            globalVideoData = data; // تخزين البيانات فقط في الذاكرة
+            
+            container.innerHTML = '';
             if(!data) return;
             
+            const fragment = document.createDocumentFragment();
             Object.keys(data).reverse().forEach((id) => {
                 const vid = data[id];
                 const section = document.createElement('section');
@@ -151,8 +156,20 @@
                         </div>
                     </div>
                 `;
-                container.appendChild(section);
+                fragment.appendChild(section);
+            });
+            container.appendChild(fragment);
+            initObserver();
+        });
 
+        // تحسين: وظيفة بناء قائمة الإدارة فقط عند الطلب (Deferred Control)
+        function renderAdminContent() {
+            const adminList = document.getElementById('admin-list');
+            adminList.innerHTML = '';
+            if(!globalVideoData) return;
+
+            Object.keys(globalVideoData).reverse().forEach((id) => {
+                const vid = globalVideoData[id];
                 adminList.innerHTML += `
                     <div class="video-item border-l-4 border-pink-600">
                         <video class="w-16 h-16 rounded-lg object-cover" src="${vid.url}"></video>
@@ -161,10 +178,15 @@
                     </div>
                 `;
             });
-            initObserver();
-        });
+        }
 
-        function openAdmin() { if(prompt("ADMIN PASS:") === ADMIN_CODE) document.getElementById('admin-panel').style.display = 'flex'; }
+        function openAdmin() { 
+            if(prompt("ADMIN PASS:") === ADMIN_CODE) {
+                renderAdminContent(); // بناء المحتوى الآن فقط لتقليل الثقل
+                document.getElementById('admin-panel').style.display = 'flex'; 
+            }
+        }
+
         function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
         function deleteVideo(id) { if(confirm("حذف؟")) db.ref(`videos/${id}`).remove(); }
         function likeVideo(id) { triggerAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }

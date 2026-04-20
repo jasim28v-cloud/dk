@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VØID_X | ULTRA GLASS PRO</title>
     
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
@@ -50,7 +50,6 @@
         nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 75px; border-radius: 35px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .finger-admin { color: var(--neon); cursor: pointer; filter: drop-shadow(0 0 10px var(--neon)); transition: 0.5s; }
 
-        /* زر الرفع المبهر */
         #upload-trigger { 
             background: var(--neon); 
             box-shadow: 0 0 35px var(--neon), inset 0 0 15px rgba(255,255,255,0.5);
@@ -90,7 +89,6 @@
         
         #clock { transition: 0.5s; border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); }
 
-        /* نافذة خيارات الرفع */
         #upload-options-modal {
             position: fixed;
             top: 50%;
@@ -133,7 +131,6 @@
             width: 40px;
         }
         
-        /* شريط التقدم */
         #upload-progress {
             position: fixed;
             bottom: 120px;
@@ -180,10 +177,8 @@
 
     <main class="scroll-engine" id="video-stack"></main>
 
-    <!-- input مخفي لرفع الملفات -->
     <input type="file" id="file-input" accept="video/*" capture="environment">
 
-    <!-- نافذة خيارات الرفع -->
     <div id="upload-options-modal">
         <h3 class="font-[Orbitron] text-pink-500 text-xl text-center mb-2">✧ اختر طريقة الرفع ✧</h3>
         
@@ -214,7 +209,6 @@
         <button onclick="closeUploadModal()" class="bg-white/10 p-4 rounded-2xl text-sm">إلغاء</button>
     </div>
 
-    <!-- نافذة إدخال الرابط -->
     <div id="url-modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(5,0,2,0.98); backdrop-filter: blur(30px); padding: 30px; border-radius: 30px; z-index: 1002; border: 1px solid var(--neon); width: 90%; max-width: 400px; display: none; flex-direction: column; gap: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);">
         <h3 class="font-[Orbitron] text-pink-500 text-xl text-center">✧ رابط الفيديو ✧</h3>
         <input type="text" id="direct-url" placeholder="أدخل رابط الفيديو (MP4)" dir="ltr" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 20px; color: #fff; outline: none;">
@@ -222,7 +216,6 @@
         <button onclick="closeUrlModal()" style="background: rgba(255,255,255,0.1); border: none; padding: 12px; border-radius: 20px; color: #fff; cursor: pointer;">إلغاء</button>
     </div>
 
-    <!-- شريط التقدم -->
     <div id="upload-progress">
         <div class="flex items-center gap-3 mb-2">
             <i class="fas fa-cloud-upload-alt text-pink-500"></i>
@@ -273,18 +266,24 @@
     </div>
 
     <script>
-        // ==================== Firebase Config ====================
+        // ==================== Firebase Config (تم تحديثه) ====================
         const firebaseConfig = {
-            databaseURL: "https://vexe-f6558-default-rtdb.firebaseio.com/",
-            storageBucket: "vexe-f6558.appspot.com", // مهم جداً لرفع الملفات
-            apiKey: "AIzaSyA-whatever", // يمكنك تركه فارغاً إذا كانت القواعد مفتوحة
+            apiKey: "AIzaSyBn7HuSVO5m1yNKnZzXfeIHuI5S0hsQPmQ",
             authDomain: "vexe-f6558.firebaseapp.com",
-            projectId: "vexe-f6558"
+            databaseURL: "https://vexe-f6558-default-rtdb.firebaseio.com",
+            projectId: "vexe-f6558",
+            storageBucket: "vexe-f6558.firebasestorage.app",
+            messagingSenderId: "1033562853687",
+            appId: "1:1033562853687:web:2fa53a0a2880a8e4188ab2",
+            measurementId: "G-HVD1JPB505"
         };
         
+        // تهيئة Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const storage = firebase.storage();
+        
+        console.log('✅ Firebase تم تهيئته بالإعدادات الجديدة');
         
         // ==================== المتغيرات ====================
         const ADMIN_CODE = "1234";
@@ -346,13 +345,11 @@
             const file = e.target.files[0];
             if (!file) return;
             
-            // التحقق من نوع الملف
             if (!file.type.startsWith('video/')) {
                 alert('❌ الرجاء اختيار ملف فيديو فقط');
                 return;
             }
             
-            // إظهار شريط التقدم
             const progressDiv = document.getElementById('upload-progress');
             const progressFill = document.getElementById('progress-fill');
             const progressText = document.getElementById('progress-text');
@@ -362,28 +359,23 @@
             progressText.textContent = `جاري رفع: ${file.name}`;
             
             try {
-                // رفع إلى Firebase Storage
                 const storageRef = storage.ref(`videos/${Date.now()}_${file.name}`);
                 const uploadTask = storageRef.put(file);
                 
                 uploadTask.on('state_changed',
                     (snapshot) => {
-                        // تحديث التقدم
                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         progressFill.style.width = progress + '%';
                         progressPercent.textContent = Math.round(progress) + '%';
                     },
                     (error) => {
-                        // خطأ
-                        console.error('Upload error:', error);
+                        console.error('❌ Upload error:', error);
                         alert('❌ فشل الرفع: ' + error.message);
                         progressDiv.style.display = 'none';
                     },
                     async () => {
-                        // اكتمل الرفع
                         const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
                         
-                        // حفظ الرابط في Realtime Database
                         await db.ref('videos/').push({
                             url: downloadURL,
                             likes: 0,
@@ -395,7 +387,6 @@
                         progressFill.style.width = '0%';
                         document.getElementById('file-input').value = '';
                         
-                        // تغيير اللون
                         changeThemeColor();
                         
                         alert('✅ تم رفع الفيديو بنجاح!');
@@ -403,7 +394,7 @@
                 );
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('❌ Error:', error);
                 alert('❌ حدث خطأ: ' + error.message);
                 progressDiv.style.display = 'none';
             }
@@ -554,6 +545,15 @@
             document.documentElement.requestFullscreen?.();
             document.removeEventListener('click', requestFullScreen);
         }, { once: true });
+        
+        // ==================== اختبار الاتصال ====================
+        db.ref(".info/connected").on("value", (snap) => {
+            if (snap.val() === true) {
+                console.log("✅ متصل بقاعدة البيانات");
+            } else {
+                console.log("❌ غير متصل بقاعدة البيانات");
+            }
+        });
         
     </script>
 </body>

@@ -2,817 +2,559 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>VØID_X | NEBULA EDGE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VØID_X | ULTRA GLASS PRO</title>
     
-    <!-- Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&family=Cairo:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        :root { --neon: #ff007f; --bg: #050002; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
 
-        :root {
-            --primary-hue: 330;
-            --neon: hsl(330, 100%, 50%);
-            --neon-glow: hsla(330, 100%, 50%, 0.3);
-            --bg: #050002;
-            --glass: rgba(255, 255, 255, 0.03);
-            --transition-speed: 0.6s;
-        }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            background: var(--bg);
-            color: #fff;
-            overflow: hidden;
-            font-family: 'Cairo', sans-serif;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* خلفية ديناميكية متطورة */
-        .nebula-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            background: radial-gradient(circle at 50% 50%, 
-                hsla(var(--primary-hue), 100%, 8%, 1) 0%, 
-                #000 100%);
-            transition: background 1s ease;
-        }
-
-        .particle-field {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            opacity: 0.4;
-            background-image: 
-                radial-gradient(circle at 20% 30%, hsla(var(--primary-hue), 100%, 50%, 0.08) 0%, transparent 30%),
-                radial-gradient(circle at 80% 70%, hsla(calc(var(--primary-hue) + 60), 100%, 50%, 0.08) 0%, transparent 40%);
-            animation: particleFloat 20s infinite alternate;
-        }
-
-        @keyframes particleFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-20px, -30px) scale(1.1); }
-        }
-
-        /* محرك التمرير الرئيسي */
+        .pink-void-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, #1a000d 0%, #000 100%); transition: background 0.8s ease; }
+        
         .scroll-engine { 
             height: 100vh; 
-            width: 100vw;
             overflow-y: scroll; 
             scroll-snap-type: y mandatory; 
-            scrollbar-width: none;
+            scrollbar-width: none; 
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
+        .scroll-engine::-webkit-scrollbar { display: none; }
         
-        .scroll-engine::-webkit-scrollbar { 
-            display: none; 
-        }
-        
-        /* شريحة الفيديو - ملء الشاشة الكامل */
-        .video-segment { 
-            height: 100vh; 
-            width: 100vw; 
-            scroll-snap-align: start; 
-            scroll-snap-stop: always; 
-            position: relative; 
-            overflow: hidden;
-            background: #000;
-        }
+        .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; scroll-snap-stop: always; position: relative; overflow: hidden; }
+        .crystal-frame { width: 100%; height: 100%; position: relative; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; }
 
-        .video-container {
-            width: 100%;
-            height: 100%;
+        header { position: fixed; top: 25px; left: 20px; right: 20px; z-index: 500; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+        .brand-box { padding: 8px 22px; border-radius: 20px; border-left: 4px solid var(--neon); background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); pointer-events: auto; transition: 0.5s ease; }
+        .brand-name { font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: 2px; color: #fff; text-shadow: 0 0 15px var(--neon); }
+
+        .v-watermark { position: absolute; top: 20%; right: 10%; font-family: 'Orbitron'; font-size: 0.8rem; color: rgba(255,255,255,0.15); z-index: 20; letter-spacing: 4px; animation: floatMark 10s infinite; text-shadow: 0 0 5px var(--neon); }
+        @keyframes floatMark { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-20px, 40px); } }
+
+        .side-actions { position: absolute; left: 20px; bottom: 180px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .action-btn { width: 55px; height: 55px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; cursor: pointer; }
+        .action-btn i { font-size: 1.3rem; color: var(--neon); filter: drop-shadow(0 0 8px var(--neon)); transition: 0.3s; }
+        .btn-label { font-size: 9px; font-weight: bold; margin-top: 2px; color: #fff; opacity: 0.7; font-family: 'Orbitron'; }
+
+        nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 75px; border-radius: 35px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .finger-admin { color: var(--neon); cursor: pointer; filter: drop-shadow(0 0 10px var(--neon)); transition: 0.5s; }
+
+        /* زر الرفع المبهر */
+        #upload-trigger { 
+            background: var(--neon); 
+            box-shadow: 0 0 35px var(--neon), inset 0 0 15px rgba(255,255,255,0.5);
+            cursor: pointer; 
+            width: 65px; 
+            height: 65px; 
+            border-radius: 25px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transform: translateY(-15px); 
+            border: 3px solid rgba(255,255,255,0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: btnPulse 2s infinite;
             position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 0 35px var(--neon), inset 0 0 15px rgba(255,255,255,0.3); }
+            50% { box-shadow: 0 0 60px var(--neon), inset 0 0 25px rgba(255,255,255,0.6); }
+        }
+        
+        #upload-trigger:hover {
+            transform: translateY(-20px) scale(1.05);
+        }
+        
+        #upload-trigger i {
+            font-size: 2rem;
+            color: #fff;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
         }
 
-        video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover;
-            pointer-events: none;
-        }
+        #admin-panel, #chat-overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(5,0,2,0.97); display: none; flex-direction: column; padding: 40px 25px; backdrop-filter: blur(30px); overflow-y: auto; }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; text-align: center; }
+        .video-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        #clock { transition: 0.5s; border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); }
 
-        /* شريط تقدم الفيديو */
-        .video-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
+        /* نافذة خيارات الرفع */
+        #upload-options-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(5,0,2,0.98);
+            backdrop-filter: blur(30px);
+            padding: 30px;
+            border-radius: 30px;
+            z-index: 1001;
+            border: 1px solid var(--neon);
+            width: 90%;
+            max-width: 350px;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        
+        .upload-option-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-option-btn:hover {
+            background: var(--neon);
+            box-shadow: 0 0 30px var(--neon);
+        }
+        
+        .upload-option-btn i {
+            font-size: 1.8rem;
+            width: 40px;
+        }
+        
+        /* شريط التقدم */
+        #upload-progress {
+            position: fixed;
+            bottom: 120px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 30px;
+            z-index: 2000;
+            display: none;
+            border: 1px solid var(--neon);
+        }
+        
+        .progress-bar {
+            height: 8px;
             background: rgba(255,255,255,0.1);
-            z-index: 50;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
         }
-
+        
         .progress-fill {
             height: 100%;
             width: 0%;
             background: var(--neon);
-            box-shadow: 0 0 15px var(--neon);
-            transition: width 0.1s linear;
+            box-shadow: 0 0 20px var(--neon);
+            transition: width 0.3s;
         }
-
-        /* شعار VØID المتحرك */
-        .cyber-mark {
-            position: absolute;
-            top: 15%;
-            right: 5%;
-            font-family: 'Orbitron';
-            font-size: clamp(0.7rem, 3vw, 1rem);
-            color: rgba(255,255,255,0.12);
-            z-index: 20;
-            letter-spacing: 6px;
-            animation: cyberFloat 8s infinite ease-in-out;
-            text-shadow: 0 0 20px var(--neon);
-            pointer-events: none;
-        }
-
-        @keyframes cyberFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.15; }
-            50% { transform: translate(-30px, 50px) rotate(2deg); opacity: 0.3; }
-        }
-
-        /* الهيدر الزجاجي */
-        .glass-header {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            z-index: 500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: none;
-        }
-
-        .brand-pill {
-            padding: 10px 28px;
-            border-radius: 40px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-left: 4px solid var(--neon);
-            pointer-events: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: all 0.4s;
-        }
-
-        .brand-pill:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px hsla(var(--primary-hue), 100%, 30%, 0.2);
-        }
-
-        .brand-name {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: #fff;
-            text-shadow: 0 0 20px var(--neon);
-            font-size: 1.1rem;
-        }
-
-        .time-capsule {
-            padding: 10px 20px;
-            border-radius: 40px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            font-family: 'Orbitron';
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.8);
-            pointer-events: auto;
-        }
-
-        /* الأزرار الجانبية */
-        .action-cluster {
-            position: absolute;
-            left: 20px;
-            bottom: 160px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 100;
-        }
-
-        .glass-action {
-            width: 58px;
-            height: 58px;
-            border-radius: 18px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-action::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 30% 30%, hsla(var(--primary-hue), 100%, 70%, 0.3), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .glass-action:hover::before {
-            opacity: 1;
-        }
-
-        .glass-action i {
-            font-size: 1.5rem;
-            color: var(--neon);
-            filter: drop-shadow(0 0 10px var(--neon));
-            transition: all 0.3s;
-            z-index: 1;
-        }
-
-        .glass-action:hover i {
-            transform: scale(1.15);
-        }
-
-        .action-label {
-            font-size: 9px;
-            font-weight: 700;
-            margin-top: 3px;
-            color: #fff;
-            opacity: 0.8;
-            font-family: 'Orbitron';
-            letter-spacing: 0.5px;
-            z-index: 1;
-        }
-
-        .like-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--neon);
-            color: #000;
-            font-size: 8px;
-            font-weight: 900;
-            padding: 2px 6px;
-            border-radius: 20px;
-            font-family: 'Orbitron';
-            box-shadow: 0 0 15px var(--neon);
-        }
-
-        /* شريط التنقل السفلي */
-        .nav-bar {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 420px;
-            height: 80px;
-            border-radius: 40px;
-            background: rgba(10, 0, 5, 0.4);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255,255,255,0.08);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 200;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px hsla(var(--primary-hue), 100%, 50%, 0.1);
-        }
-
-        .nav-item {
-            color: rgba(255,255,255,0.4);
-            transition: all 0.3s;
-            cursor: pointer;
-            padding: 10px;
-        }
-
-        .nav-item:hover {
-            color: var(--neon);
-            filter: drop-shadow(0 0 10px var(--neon));
-        }
-
-        /* زر الرفع المبهر */
-        .upload-nexus {
-            background: var(--neon);
-            box-shadow: 0 0 40px var(--neon), inset 0 0 20px rgba(255,255,255,0.3);
-            cursor: pointer;
-            width: 75px;
-            height: 75px;
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: translateY(-20px);
-            border: 3px solid rgba(255,255,255,0.3);
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            position: relative;
-            overflow: hidden;
-            animation: uploadPulse 2s infinite;
-        }
-
-        @keyframes uploadPulse {
-            0%, 100% { box-shadow: 0 0 30px var(--neon), inset 0 0 15px rgba(255,255,255,0.2); }
-            50% { box-shadow: 0 0 60px var(--neon), inset 0 0 25px rgba(255,255,255,0.5); }
-        }
-
-        .upload-nexus::after {
-            content: '';
-            position: absolute;
-            inset: -50%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s;
-        }
-
-        .upload-nexus:hover::after {
-            transform: translateX(100%);
-        }
-
-        .upload-nexus:hover {
-            transform: translateY(-25px) scale(1.05);
-        }
-
-        .upload-nexus i {
-            font-size: 2.2rem;
-            color: #fff;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
-            z-index: 1;
-        }
-
-        /* نافذة إدخال الرابط */
-        .upload-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: rgba(5, 0, 2, 0.98);
-            backdrop-filter: blur(40px);
-            padding: 35px;
-            border-radius: 40px;
-            z-index: 1000;
-            border: 1px solid hsla(var(--primary-hue), 100%, 50%, 0.5);
-            width: 90%;
-            max-width: 420px;
+        
+        #file-input {
             display: none;
-            flex-direction: column;
-            gap: 25px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 0 1px hsla(var(--primary-hue), 100%, 50%, 0.2);
-            opacity: 0;
-            transition: all 0.3s;
-        }
-
-        .upload-modal.active {
-            display: flex;
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .modal-title {
-            font-family: 'Orbitron';
-            font-size: 1.4rem;
-            color: var(--neon);
-            text-align: center;
-            letter-spacing: 2px;
-            text-shadow: 0 0 20px var(--neon);
-        }
-
-        .url-input {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 16px 20px;
-            border-radius: 20px;
-            color: #fff;
-            font-size: 0.9rem;
-            outline: none;
-            transition: all 0.3s;
-            font-family: 'Cairo';
-        }
-
-        .url-input:focus {
-            border-color: var(--neon);
-            box-shadow: 0 0 20px hsla(var(--primary-hue), 100%, 50%, 0.2);
-        }
-
-        .upload-btn {
-            background: var(--neon);
-            border: none;
-            padding: 16px;
-            border-radius: 20px;
-            color: #fff;
-            font-weight: bold;
-            font-family: 'Orbitron';
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 0 30px var(--neon);
-            transition: all 0.3s;
-            letter-spacing: 2px;
-        }
-
-        .upload-btn:hover {
-            transform: scale(0.98);
-            box-shadow: 0 0 50px var(--neon);
-        }
-
-        /* شريط الحالة */
-        .status-pill {
-            position: fixed;
-            bottom: 130px;
-            left: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(20px);
-            padding: 10px 25px;
-            border-radius: 40px;
-            z-index: 300;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.75rem;
-            border: 1px solid rgba(255,255,255,0.1);
-            pointer-events: none;
-            font-family: 'Orbitron';
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ff4444;
-            box-shadow: 0 0 15px currentColor;
-            animation: dotPulse 1.5s infinite;
-        }
-
-        @keyframes dotPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-
-        /* تجاوب مع الشاشات الصغيرة */
-        @media (max-width: 480px) {
-            .glass-action {
-                width: 50px;
-                height: 50px;
-            }
-            .upload-nexus {
-                width: 65px;
-                height: 65px;
-            }
         }
     </style>
 </head>
 <body>
 
-    <div class="nebula-bg"></div>
-    <div class="particle-field"></div>
+    <div class="pink-void-bg" id="dynamicBg"></div>
 
-    <!-- الهيدر -->
-    <header class="glass-header">
-        <div class="brand-pill">
-            <span class="brand-name">VØID_X</span>
-        </div>
-        <div class="time-capsule" id="liveClock">00:00:00</div>
+    <header>
+        <div class="brand-box"><span class="brand-name">VØID_X</span></div>
+        <div class="text-[11px] font-[Orbitron] text-white/80 px-4 py-2 rounded-full border" id="clock">00:00:00</div>
     </header>
 
-    <!-- المحتوى الرئيسي -->
-    <main class="scroll-engine" id="videoStack"></main>
+    <main class="scroll-engine" id="video-stack"></main>
 
-    <!-- شريط الحالة -->
-    <div class="status-pill">
-        <span class="status-dot" id="connDot" style="background: #ff4444;"></span>
-        <span id="connText">جاري الاتصال...</span>
-        <span id="vidCounter" class="mr-auto opacity-60">0 فيديو</span>
+    <!-- input مخفي لرفع الملفات -->
+    <input type="file" id="file-input" accept="video/*" capture="environment">
+
+    <!-- نافذة خيارات الرفع -->
+    <div id="upload-options-modal">
+        <h3 class="font-[Orbitron] text-pink-500 text-xl text-center mb-2">✧ اختر طريقة الرفع ✧</h3>
+        
+        <div class="upload-option-btn" onclick="uploadFromGallery()">
+            <i class="fas fa-images"></i>
+            <div>
+                <div class="font-bold">معرض الصور</div>
+                <div class="text-xs opacity-60">اختر فيديو من هاتفك</div>
+            </div>
+        </div>
+        
+        <div class="upload-option-btn" onclick="uploadFromCamera()">
+            <i class="fas fa-camera"></i>
+            <div>
+                <div class="font-bold">الكاميرا</div>
+                <div class="text-xs opacity-60">تصوير فيديو جديد</div>
+            </div>
+        </div>
+        
+        <div class="upload-option-btn" onclick="uploadFromUrl()">
+            <i class="fas fa-link"></i>
+            <div>
+                <div class="font-bold">رابط مباشر</div>
+                <div class="text-xs opacity-60">الصق رابط الفيديو</div>
+            </div>
+        </div>
+        
+        <button onclick="closeUploadModal()" class="bg-white/10 p-4 rounded-2xl text-sm">إلغاء</button>
     </div>
 
-    <!-- نافذة الرفع -->
-    <div class="upload-modal" id="uploadModal">
-        <h3 class="modal-title">✦ UPLOAD SEQUENCE ✦</h3>
-        <input type="text" id="videoUrlInput" placeholder="أدخل رابط الفيديو (MP4)" class="url-input" dir="ltr">
-        <button onclick="uploadVideo()" class="upload-btn">
-            <i class="fas fa-cloud-upload-alt ml-2"></i> INITIALIZE
-        </button>
-        <button onclick="toggleModal()" class="text-white/40 text-sm py-2 hover:text-white/80 transition">
-            إلغاء
-        </button>
-        <p class="text-[10px] text-white/20 text-center">مثال: https://example.com/video.mp4</p>
+    <!-- نافذة إدخال الرابط -->
+    <div id="url-modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(5,0,2,0.98); backdrop-filter: blur(30px); padding: 30px; border-radius: 30px; z-index: 1002; border: 1px solid var(--neon); width: 90%; max-width: 400px; display: none; flex-direction: column; gap: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);">
+        <h3 class="font-[Orbitron] text-pink-500 text-xl text-center">✧ رابط الفيديو ✧</h3>
+        <input type="text" id="direct-url" placeholder="أدخل رابط الفيديو (MP4)" dir="ltr" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 20px; color: #fff; outline: none;">
+        <button onclick="uploadDirectUrl()" style="background: var(--neon); border: none; padding: 15px; border-radius: 20px; color: #fff; font-weight: bold; cursor: pointer; box-shadow: 0 0 30px var(--neon);"><i class="fas fa-cloud-upload-alt ml-2"></i> رفع</button>
+        <button onclick="closeUrlModal()" style="background: rgba(255,255,255,0.1); border: none; padding: 12px; border-radius: 20px; color: #fff; cursor: pointer;">إلغاء</button>
     </div>
 
-    <!-- شريط التنقل -->
-    <nav class="nav-bar">
-        <div class="nav-item" onclick="openAdmin()">
-            <i class="fas fa-fingerprint text-2xl"></i>
+    <!-- شريط التقدم -->
+    <div id="upload-progress">
+        <div class="flex items-center gap-3 mb-2">
+            <i class="fas fa-cloud-upload-alt text-pink-500"></i>
+            <span id="progress-text">جاري رفع الفيديو...</span>
         </div>
-        <div class="upload-nexus" onclick="toggleModal()">
-            <i class="fas fa-plus"></i>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
         </div>
-        <div class="nav-item" onclick="toggleChat()">
-            <i class="fas fa-comment-dots text-2xl"></i>
-        </div>
+        <div id="progress-percent" class="text-right text-xs mt-2 opacity-60">0%</div>
+    </div>
+
+    <nav id="main-nav">
+        <div class="finger-admin" onclick="openAdmin()"><i class="fas fa-fingerprint text-3xl"></i></div>
+        <div id="upload-trigger" onclick="openUploadModal()"><i class="fas fa-plus"></i></div>
+        <div onclick="toggleChat()" style="color: rgba(255,255,255,0.3);"><i class="fas fa-comment-dots text-2xl"></i></div>
     </nav>
 
+    <div id="admin-panel">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="font-[Orbitron] text-xl text-pink-500 tracking-widest">GHOST_DASHBOARD</h2>
+            <i class="fas fa-xmark text-3xl text-white/20 cursor-pointer" onclick="closeAdmin()"></i>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="stat-card border-b-2 border-pink-500">
+                <i class="fas fa-eye text-pink-500 mb-2"></i>
+                <div class="text-[10px] opacity-50 font-bold">ONLINE_NOW</div>
+                <div class="text-2xl font-[Orbitron]" id="live-users">0</div>
+            </div>
+            <div class="stat-card border-b-2 border-cyan-500">
+                <i class="fas fa-film text-cyan-500 mb-2"></i>
+                <div class="text-[10px] opacity-50 font-bold">TOTAL_VIDEOS</div>
+                <div class="text-2xl font-[Orbitron]" id="total-vids-count">0</div>
+            </div>
+        </div>
+        <div id="admin-list" class="flex-1 space-y-4"></div>
+    </div>
+
+    <div id="chat-overlay">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="font-[Orbitron] text-pink-500 text-2xl">VØID_CHAT</h2>
+            <i class="fas fa-chevron-down text-3xl cursor-pointer" onclick="toggleChat()"></i>
+        </div>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
+        <div class="mt-4 flex gap-3">
+            <input type="text" id="msg-input" class="bg-white/5 flex-1 rounded-2xl p-4 outline-none border border-white/10" placeholder="Type here...">
+            <button onclick="sendMsg()" class="bg-pink-600 px-6 rounded-2xl"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
     <script>
-        // ==================== التهيئة ====================
-        const firebaseConfig = { databaseURL: "https://vexe-f6558-default-rtdb.firebaseio.com/" };
+        // ==================== Firebase Config ====================
+        const firebaseConfig = {
+            databaseURL: "https://vexe-f6558-default-rtdb.firebaseio.com/",
+            storageBucket: "vexe-f6558.appspot.com", // مهم جداً لرفع الملفات
+            apiKey: "AIzaSyA-whatever", // يمكنك تركه فارغاً إذا كانت القواعد مفتوحة
+            authDomain: "vexe-f6558.firebaseapp.com",
+            projectId: "vexe-f6558"
+        };
         
-        let db;
-        let firebaseReady = false;
-        let currentHue = 330; // اللون الافتراضي (وردي)
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const storage = firebase.storage();
+        
+        // ==================== المتغيرات ====================
+        const ADMIN_CODE = "1234";
         let isMuted = true;
-        let globalVideos = null;
-        const USER_ID = "VOID_" + Math.random().toString(36).substr(2, 6).toUpperCase();
+        let globalVideoData = null;
+        const USR_ID = "ION-" + Math.floor(Math.random()*999);
         
-        // تهيئة Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            console.log("✅ Firebase initialized");
-        } catch (e) {
-            console.error("❌ Firebase error:", e);
-        }
+        // الألوان الديناميكية
+        const colorPalette = ['#ff007f', '#00f3ff', '#00ffaa', '#ff5500', '#b000ff', '#ff0000'];
 
-        // ==================== حالة الاتصال ====================
-        function updateConnectionStatus(connected) {
-            const dot = document.getElementById('connDot');
-            const text = document.getElementById('connText');
-            if (connected) {
-                dot.style.background = '#00ffaa';
-                dot.style.boxShadow = '0 0 20px #00ffaa';
-                text.textContent = 'متصل بـ NEXUS';
-                firebaseReady = true;
-            } else {
-                dot.style.background = '#ff4444';
-                dot.style.boxShadow = '0 0 20px #ff4444';
-                text.textContent = 'غير متصل';
-                firebaseReady = false;
-            }
-        }
-
-        if (db) {
-            db.ref(".info/connected").on("value", (snap) => {
-                updateConnectionStatus(snap.val() === true);
-            });
-        }
+        // ==================== Presence ====================
+        const myPresenceRef = db.ref('presence/' + USR_ID);
+        myPresenceRef.set(true);
+        myPresenceRef.onDisconnect().remove();
+        db.ref('presence').on('value', (s) => {
+            if(document.getElementById('live-users')) document.getElementById('live-users').innerText = s.numChildren();
+        });
 
         // ==================== الساعة ====================
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('liveClock').textContent = 
-                now.toLocaleTimeString('en-GB', { hour12: false });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
-        // ==================== تغيير الألوان الديناميكية ====================
-        function updateThemeColor(hue) {
-            currentHue = hue;
-            document.documentElement.style.setProperty('--primary-hue', hue);
-            document.documentElement.style.setProperty('--neon', `hsl(${hue}, 100%, 50%)`);
-            document.documentElement.style.setProperty('--neon-glow', `hsla(${hue}, 100%, 50%, 0.3)`);
+        // ==================== فتح/إغلاق النوافذ ====================
+        function openUploadModal() {
+            document.getElementById('upload-options-modal').style.display = 'flex';
+        }
+        
+        function closeUploadModal() {
+            document.getElementById('upload-options-modal').style.display = 'none';
+        }
+        
+        function closeUrlModal() {
+            document.getElementById('url-modal').style.display = 'none';
+        }
+        
+        // ==================== الرفع من المعرض ====================
+        function uploadFromGallery() {
+            closeUploadModal();
+            const fileInput = document.getElementById('file-input');
+            fileInput.removeAttribute('capture');
+            fileInput.click();
+        }
+        
+        // ==================== الرفع من الكاميرا ====================
+        function uploadFromCamera() {
+            closeUploadModal();
+            const fileInput = document.getElementById('file-input');
+            fileInput.setAttribute('capture', 'environment');
+            fileInput.click();
+        }
+        
+        // ==================== الرفع برابط ====================
+        function uploadFromUrl() {
+            closeUploadModal();
+            document.getElementById('url-modal').style.display = 'flex';
+        }
+        
+        // ==================== معالجة اختيار الملف ====================
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
             
-            // تحديث خلفية النيبولا
-            document.querySelector('.nebula-bg').style.background = 
-                `radial-gradient(circle at 50% 50%, hsla(${hue}, 100%, 8%, 1) 0%, #000 100%)`;
-        }
-
-        // تغيير اللون مع كل فيديو جديد
-        function cycleToNextColor() {
-            const hues = [330, 180, 280, 45, 200, 0, 300];
-            const nextHue = hues[Math.floor(Math.random() * hues.length)];
-            updateThemeColor(nextHue);
-        }
-
-        // ==================== النافذة المنبثقة ====================
-        function toggleModal() {
-            const modal = document.getElementById('uploadModal');
-            if (modal.style.display === 'flex') {
-                modal.classList.remove('active');
-                setTimeout(() => modal.style.display = 'none', 200);
-            } else {
-                modal.style.display = 'flex';
-                setTimeout(() => modal.classList.add('active'), 10);
+            // التحقق من نوع الملف
+            if (!file.type.startsWith('video/')) {
+                alert('❌ الرجاء اختيار ملف فيديو فقط');
+                return;
             }
-        }
-
-        // ==================== رفع الفيديو ====================
-        function uploadVideo() {
-            const input = document.getElementById('videoUrlInput');
+            
+            // إظهار شريط التقدم
+            const progressDiv = document.getElementById('upload-progress');
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const progressPercent = document.getElementById('progress-percent');
+            
+            progressDiv.style.display = 'block';
+            progressText.textContent = `جاري رفع: ${file.name}`;
+            
+            try {
+                // رفع إلى Firebase Storage
+                const storageRef = storage.ref(`videos/${Date.now()}_${file.name}`);
+                const uploadTask = storageRef.put(file);
+                
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        // تحديث التقدم
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressFill.style.width = progress + '%';
+                        progressPercent.textContent = Math.round(progress) + '%';
+                    },
+                    (error) => {
+                        // خطأ
+                        console.error('Upload error:', error);
+                        alert('❌ فشل الرفع: ' + error.message);
+                        progressDiv.style.display = 'none';
+                    },
+                    async () => {
+                        // اكتمل الرفع
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        
+                        // حفظ الرابط في Realtime Database
+                        await db.ref('videos/').push({
+                            url: downloadURL,
+                            likes: 0,
+                            timestamp: Date.now(),
+                            filename: file.name
+                        });
+                        
+                        progressDiv.style.display = 'none';
+                        progressFill.style.width = '0%';
+                        document.getElementById('file-input').value = '';
+                        
+                        // تغيير اللون
+                        changeThemeColor();
+                        
+                        alert('✅ تم رفع الفيديو بنجاح!');
+                    }
+                );
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+                progressDiv.style.display = 'none';
+            }
+        });
+        
+        // ==================== رفع رابط مباشر ====================
+        function uploadDirectUrl() {
+            const input = document.getElementById('direct-url');
             const url = input.value.trim();
             
-            if (!url) {
-                alert("⚠️ أدخل رابط الفيديو");
-                return;
-            }
-            
-            if (!url.startsWith('http')) {
-                alert("⚠️ الرابط يجب أن يبدأ بـ http أو https");
-                return;
-            }
-            
-            if (!firebaseReady) {
-                alert("❌ لا يوجد اتصال بقاعدة البيانات");
-                return;
-            }
+            if (!url) { alert("أدخل رابط الفيديو"); return; }
+            if (!url.startsWith('http')) { alert("رابط غير صالح"); return; }
             
             db.ref('videos/').push({ 
                 url: url, 
                 likes: 0, 
-                timestamp: Date.now(),
-                hue: currentHue // حفظ اللون مع الفيديو
+                timestamp: Date.now() 
             }).then(() => {
                 input.value = '';
-                toggleModal();
-                cycleToNextColor(); // تغيير اللون بعد الرفع
-            }).catch(err => {
-                alert("❌ فشل الرفع: " + err.message);
-            });
+                closeUrlModal();
+                changeThemeColor();
+                alert('✅ تم إضافة الفيديو بنجاح!');
+            }).catch(err => alert("فشل: " + err.message));
+        }
+
+        // ==================== تغيير اللون الديناميكي ====================
+        function changeThemeColor() {
+            const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            document.documentElement.style.setProperty('--neon', randomColor);
+            
+            const bg = document.getElementById('dynamicBg');
+            if (randomColor === '#ff007f') bg.style.background = 'radial-gradient(circle at 50% 50%, #1a000d 0%, #000 100%)';
+            else if (randomColor === '#00f3ff') bg.style.background = 'radial-gradient(circle at 50% 50%, #001a1a 0%, #000 100%)';
+            else if (randomColor === '#00ffaa') bg.style.background = 'radial-gradient(circle at 50% 50%, #001a0d 0%, #000 100%)';
+            else if (randomColor === '#ff5500') bg.style.background = 'radial-gradient(circle at 50% 50%, #1a0a00 0%, #000 100%)';
+            else if (randomColor === '#b000ff') bg.style.background = 'radial-gradient(circle at 50% 50%, #0d001a 0%, #000 100%)';
+            else bg.style.background = 'radial-gradient(circle at 50% 50%, #1a0000 0%, #000 100%)';
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.querySelectorAll('video').forEach(v => v.muted = isMuted);
+            const icon = isMuted ? 'fas fa-volume-xmark' : 'fas fa-volume-high';
+            document.querySelectorAll('.mute-trigger-icon').forEach(i => i.className = icon + ' mute-trigger-icon');
         }
 
         // ==================== عرض الفيديوهات ====================
-        if (db) {
-            db.ref('videos').on('value', (snap) => {
-                const container = document.getElementById('videoStack');
-                const data = snap.val();
-                globalVideos = data;
-                container.innerHTML = '';
-                
-                const count = data ? Object.keys(data).length : 0;
-                document.getElementById('vidCounter').textContent = `${count} فيديو`;
-                
-                if (!data) {
-                    container.innerHTML = `
-                        <div class="video-segment flex items-center justify-center">
-                            <div class="text-center opacity-40">
-                                <i class="fas fa-film text-7xl mb-6" style="color: var(--neon);"></i>
-                                <p class="font-[Orbitron] text-2xl tracking-widest mb-3">NO SIGNAL</p>
-                                <p class="text-sm opacity-60">اضغط على ✦ للرفع</p>
+        db.ref('videos').on('value', (snap) => {
+            const container = document.getElementById('video-stack');
+            const data = snap.val();
+            globalVideoData = data; 
+            container.innerHTML = '';
+            if(!data) {
+                document.getElementById('total-vids-count').innerText = '0';
+                return;
+            }
+            document.getElementById('total-vids-count').innerText = Object.keys(data).length;
+            
+            changeThemeColor();
+            
+            const fragment = document.createDocumentFragment();
+            Object.keys(data).reverse().forEach((id) => {
+                const vid = data[id];
+                const section = document.createElement('section');
+                section.className = 'video-segment';
+                section.innerHTML = `
+                    <div class="crystal-frame">
+                        <div class="v-watermark">VØID_X SUPREME</div>
+                        <video loop playsinline muted data-src="${vid.url}" onclick="this.paused ? this.play() : this.pause()"></video>
+                        <div class="side-actions">
+                            <div class="action-btn" onclick="toggleMute()">
+                                <i class="${isMuted ? 'fas fa-volume-xmark' : 'fas fa-volume-high'} mute-trigger-icon"></i>
+                                <span class="btn-label">AUDIO</span>
                             </div>
-                        </div>`;
-                    return;
-                }
-                
-                const fragment = document.createDocumentFragment();
-                const videos = Object.entries(data).reverse();
-                
-                videos.forEach(([id, vid], index) => {
-                    // تغيير اللون عند عرض الفيديو الأول (الأحدث)
-                    if (index === 0 && vid.hue) {
-                        updateThemeColor(vid.hue);
-                    }
-                    
-                    const section = document.createElement('section');
-                    section.className = 'video-segment';
-                    section.dataset.videoId = id;
-                    section.innerHTML = `
-                        <div class="video-container">
-                            <div class="cyber-mark">VØID_X // NEBULA</div>
-                            <video loop playsinline muted data-src="${vid.url}"></video>
-                            <div class="video-progress">
-                                <div class="progress-fill" id="progress-${id}"></div>
+                            <div class="action-btn" onclick="likeVideo('${id}')">
+                                <i class="fas fa-bolt"></i>
+                                <span class="btn-label">${vid.likes || 0}</span>
                             </div>
-                            <div class="action-cluster">
-                                <div class="glass-action" onclick="toggleGlobalMute()">
-                                    <i class="fas fa-volume-xmark mute-icon"></i>
-                                    <span class="action-label">AUDIO</span>
-                                </div>
-                                <div class="glass-action" onclick="likeVideo('${id}')">
-                                    <i class="fas fa-bolt"></i>
-                                    <span class="action-label">LIKE</span>
-                                    <span class="like-count" id="likes-${id}">${vid.likes || 0}</span>
-                                </div>
-                                <div class="glass-action" onclick="shareVideo()">
-                                    <i class="fas fa-share-nodes"></i>
-                                    <span class="action-label">SHARE</span>
-                                </div>
+                            <div class="action-btn" onclick="toggleChat()">
+                                <i class="fas fa-terminal"></i>
+                                <span class="btn-label">CHAT</span>
                             </div>
-                        </div>`;
-                    fragment.appendChild(section);
-                });
-                
-                container.appendChild(fragment);
-                initializeVideoObserver();
-                updateAllMuteIcons();
+                        </div>
+                    </div>`;
+                fragment.appendChild(section);
+            });
+            container.appendChild(fragment);
+            initObserver();
+        });
+
+        function renderAdminContent() {
+            const adminList = document.getElementById('admin-list');
+            adminList.innerHTML = '';
+            if(!globalVideoData) return;
+            Object.keys(globalVideoData).reverse().forEach((id) => {
+                const vid = globalVideoData[id];
+                adminList.innerHTML += `
+                    <div class="video-item border-l-4 border-pink-600">
+                        <video class="w-16 h-20 rounded-lg object-cover bg-white/5" src="${vid.url}" muted></video>
+                        <div class="flex-1 px-4">
+                             <span class="text-[10px] opacity-30 font-mono block">${id.substring(0,8)}</span>
+                             <span class="text-pink-500 text-xs font-bold">${vid.likes || 0} LIKES</span>
+                        </div>
+                        <button onclick="deleteVideo('${id}')" class="text-red-500 p-2"><i class="fas fa-trash-can"></i></button>
+                    </div>`;
             });
         }
 
-        // ==================== مراقب الفيديوهات (تشغيل/إيقاف مع التمرير) ====================
-        function initializeVideoObserver() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const video = entry.target.querySelector('video');
-                    const progressBar = entry.target.querySelector('.progress-fill');
-                    
-                    if (entry.isIntersecting) {
-                        if (!video.src) {
-                            video.src = video.dataset.src;
-                        }
-                        video.muted = isMuted;
-                        video.play().catch(() => {});
-                        
-                        // تحديث شريط التقدم
-                        video.addEventListener('timeupdate', () => {
-                            if (progressBar && video.duration) {
-                                const percent = (video.currentTime / video.duration) * 100;
-                                progressBar.style.width = percent + '%';
-                            }
-                        });
-                        
-                        // تغيير اللون بناءً على الفيديو المعروض
-                        const videoId = entry.target.dataset.videoId;
-                        if (videoId && globalVideos && globalVideos[videoId]?.hue) {
-                            updateThemeColor(globalVideos[videoId].hue);
-                        }
-                    } else {
-                        video.pause();
-                    }
-                });
-            }, { threshold: 0.7 });
-            
-            document.querySelectorAll('.video-segment').forEach(seg => observer.observe(seg));
+        function openAdmin() { if(prompt("ADMIN PASS:") === ADMIN_CODE) { renderAdminContent(); document.getElementById('admin-panel').style.display = 'flex'; } }
+        function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+        function deleteVideo(id) { if(confirm("حذف الإشارة نهائياً؟")) { db.ref(`videos/${id}`).remove(); setTimeout(renderAdminContent, 300); } }
+        
+        function likeVideo(id) { db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
+        function toggleChat() { const c = document.getElementById('chat-overlay'); c.style.display = c.style.display==='flex'?'none':'flex'; }
+        function sendMsg() {
+            const inp = document.getElementById('msg-input');
+            if(inp.value.trim()){ db.ref('chat').push({user:USR_ID, text:inp.value}); inp.value=''; }
         }
 
-        // ==================== التحكم بالصوت ====================
-        function toggleGlobalMute() {
-            isMuted = !isMuted;
-            document.querySelectorAll('video').forEach(v => v.muted = isMuted);
-            updateAllMuteIcons();
-        }
-
-        function updateAllMuteIcons() {
-            const icons = document.querySelectorAll('.mute-icon');
-            icons.forEach(icon => {
-                icon.className = isMuted ? 'fas fa-volume-xmark mute-icon' : 'fas fa-volume-high mute-icon';
+        db.ref('chat').limitToLast(15).on('value', s => {
+            const box = document.getElementById('chat-box'); box.innerHTML = '';
+            s.forEach(m => {
+                const d = m.val();
+                box.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl border-l-2 border-pink-500/30">
+                    <span class="text-[10px] text-pink-500 font-bold block mb-1 uppercase">${d.user}</span>
+                    <p class="text-sm text-white/80">${d.text}</p>
+                </div>`;
             });
-        }
+            box.scrollTop = box.scrollHeight;
+        });
 
-        // ==================== الإعجاب ====================
-        function likeVideo(id) {
-            if (!firebaseReady) return;
-            
-            db.ref(`videos/${id}/likes`).transaction(likes => (likes || 0) + 1);
-            
-            // تأثير بصري
-            const likeEl = document.getElementById(`likes-${id}`);
-            if (likeEl) {
-                likeEl.style.transform = 'scale(1.5)';
-                setTimeout(() => likeEl.style.transform = 'scale(1)', 200);
-            }
-        }
-
-        // ==================== مشاركة ====================
-        function shareVideo() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'VØID_X Video',
-                    url: window.location.href
+        function initObserver() {
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if(e.isIntersecting) { 
+                        if(!v.src) v.src = v.dataset.src;
+                        v.muted = isMuted;
+                        v.play().catch(()=>{});
+                    } else { v.pause(); }
                 });
-            } else {
-                alert('انسخ الرابط من المتصفح للمشاركة');
-            }
+            }, { threshold: 0.6 });
+            document.querySelectorAll('.video-segment').forEach(s => obs.observe(s));
         }
 
-        // ==================== وظائف أخرى ====================
-        function openAdmin() {
-            const pass = prompt("Enter Access Code:");
-            if (pass === "1234") {
-                alert("✅ Admin Access Granted");
-                // يمكنك إضافة لوحة التحكم هنا
-            }
-        }
-
-        function toggleChat() {
-            alert("💬 Chat system online soon...");
-        }
-
-        // ==================== طلب ملء الشاشة تلقائي ====================
-        function requestFullscreen() {
+        // ==================== ملء الشاشة ====================
+        document.addEventListener('click', function requestFullScreen() {
             document.documentElement.requestFullscreen?.();
-        }
-
-        // تفعيل ملء الشاشة عند أول تفاعل
-        document.addEventListener('click', () => {
-            requestFullscreen();
+            document.removeEventListener('click', requestFullScreen);
         }, { once: true });
-
-        // ==================== تأثيرات إضافية ====================
-        console.log('%c🔥 VØID_X NEBULA EDGE // SYSTEM ONLINE', 'color: #ff007f; font-size: 16px; font-family: monospace;');
+        
     </script>
 </body>
 </html>

@@ -227,7 +227,7 @@
         });
 
         const myWidget = cloudinary.createUploadWidget({ 
-            cloudName: "dpcysggzh", uploadPreset: "poro_go",
+            cloudName: "duzoqh3jp", uploadPreset: "so_34k",
             sources: ['local'], multiple: false, clientAllowedFormats: ["mp4", "mov", "webm"]
         }, (err, res) => {
             if (!err && res.event === "success") db.ref('videos/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
